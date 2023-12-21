@@ -23,6 +23,7 @@ type LoggerConfigs struct {
 	Path          string
 	IsCompressed  bool
 	IsDailyRotate bool
+	IsLogRotator  bool
 	SleepDuration time.Duration
 }
 

@@ -28,6 +28,7 @@ func Init() {
 	conf.Logger.Path = cc.AsString("LOG_PATH", "./log/logger.log")
 	conf.Logger.IsCompressed = cc.AsBool("LOG_COMPRESSED", true)
 	conf.Logger.IsDailyRotate = cc.AsBool("LOG_DAILY_ROTATE", true)
+	conf.Logger.IsLogRotator = cc.AsBool("LOG_ROTATOR", true)
 	conf.Logger.SleepDuration = cc.AsTimeDuration("LOG_SLEEP_DURATION", 5*time.Second)
 
 	conf.Cors.AllowOrigins = cc.AsString("ALLOW_ORIGINS", "*")
