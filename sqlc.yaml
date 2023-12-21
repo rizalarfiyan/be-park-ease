@@ -1,0 +1,8 @@
+version: "1"
+packages:
+  - name: "sql"
+    path: "internal/sql"
+    queries: "./database/query/"
+    schema: "./database/schema/"
+    engine: "postgresql"
+    json_tags_case_style: "camel"
