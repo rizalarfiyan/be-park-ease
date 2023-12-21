@@ -1,7 +1,9 @@
 package main
 
 import (
+	"be-park-ease/constants"
 	_ "be-park-ease/docs"
+	"be-park-ease/exception"
 
 	"be-park-ease/config"
 	"be-park-ease/internal"
@@ -39,7 +41,10 @@ func main() {
 	rawLogs := logger.GetWithoutCaller("main-api")
 	logs := rawLogs.With().Caller().Logger()
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: exception.ErrorHandler,
+		BodyLimit:    constants.FiberBodyLimit,
+	})
 	app.Use(fiberzerolog.New(config.FiberZerolog(rawLogs, logs)))
 	app.Use(recover.New(config.FiberRecover()))
 	app.Use(requestid.New())
