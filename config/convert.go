@@ -16,8 +16,7 @@ type ConfigConvert interface {
 	AsZerologLevel(key string, defaultVal zerolog.Level) zerolog.Level
 }
 
-type configConvert struct {
-}
+type configConvert struct{}
 
 func NewConfigConvert() ConfigConvert {
 	return &configConvert{}
