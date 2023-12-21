@@ -23,6 +23,17 @@ func NewBaseHandler() BaseHandler {
 	}
 }
 
+// Base Home godoc
+//
+//	@Summary		Get Base Home based on parameter
+//	@Description	Base Home
+//	@ID				get-base-home
+//	@Tags			home
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	response.BaseResponse
+//	@Failure		500	{object}	response.BaseResponse
+//	@Router			/ [get]
 func (h *baseHandler) Home(ctx *fiber.Ctx) error {
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,

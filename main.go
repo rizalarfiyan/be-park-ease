@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "be-park-ease/docs"
+
 	"be-park-ease/config"
 	"be-park-ease/internal"
 	"be-park-ease/internal/handler"
@@ -15,11 +17,13 @@ import (
 
 	"github.com/gofiber/contrib/fiberzerolog"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gofiber/swagger"
 	"github.com/rs/zerolog"
 )
 
@@ -42,6 +46,17 @@ func main() {
 	app.Use(cors.New(config.CorsConfig()))
 	app.Use(compress.New())
 	app.Use(helmet.New())
+
+	app.Get("/swagger/*", basicauth.New(basicauth.Config{
+		Users: map[string]string{
+			conf.Swagger.Username: conf.Swagger.Password,
+		},
+	}), swagger.New(swagger.Config{
+		URL:          "/swagger/doc.json",
+		DeepLinking:  true,
+		DocExpansion: "list",
+	}))
+
 	route := internal.NewRouter(app)
 
 	// handler

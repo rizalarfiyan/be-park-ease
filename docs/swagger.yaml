@@ -1,0 +1,35 @@
+definitions:
+  response.BaseResponse:
+    properties:
+      code:
+        example: 999
+        type: integer
+      data: {}
+      message:
+        example: Message!
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Base Home
+      operationId: get-base-home
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get Base Home based on parameter
+      tags:
+      - home
+swagger: "2.0"
