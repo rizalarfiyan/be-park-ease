@@ -9,8 +9,8 @@ import (
 )
 
 type AuthRepository interface {
-	GetAllByToken(ctx context.Context, token string) (sql.User, error)
-	GetAllByUsername(ctx context.Context, username string) (sql.User, error)
+	GetUserByToken(ctx context.Context, token string) (sql.User, error)
+	GetUserByUsername(ctx context.Context, username string) (sql.User, error)
 	UpdateUserToken(ctx context.Context, arg sql.UpdateUserTokenParams) error
 }
 
@@ -26,12 +26,12 @@ func NewAuthRepository(db *pgxpool.Pool) AuthRepository {
 	}
 }
 
-func (r authRepository) GetAllByToken(ctx context.Context, token string) (sql.User, error) {
-	return r.query.GetAllByToken(ctx, utils.PGText(token))
+func (r authRepository) GetUserByToken(ctx context.Context, token string) (sql.User, error) {
+	return r.query.GetUserByToken(ctx, utils.PGText(token))
 }
 
-func (r authRepository) GetAllByUsername(ctx context.Context, username string) (sql.User, error) {
-	return r.query.GetAllByUsername(ctx, username)
+func (r authRepository) GetUserByUsername(ctx context.Context, username string) (sql.User, error) {
+	return r.query.GetUserByUsername(ctx, username)
 }
 
 func (r authRepository) UpdateUserToken(ctx context.Context, arg sql.UpdateUserTokenParams) error {

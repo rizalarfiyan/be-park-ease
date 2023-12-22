@@ -5,6 +5,7 @@ import (
 	"be-park-ease/database"
 	_ "be-park-ease/docs"
 	"be-park-ease/exception"
+	"be-park-ease/middleware"
 
 	"be-park-ease/config"
 	"be-park-ease/internal"
@@ -42,6 +43,19 @@ func init() {
 	database.InitPostgres(ctx)
 }
 
+// @title						BE Park Ease API
+// @version					1.0
+// @termsOfService				http://swagger.io/terms/
+// @contact.name				Rizal Arfiyan
+// @contact.url				https://rizalrfiyan.com
+// @contact.email				rizal.arfiyan.23@gmail.com
+// @license.name				Apache 2.0
+// @license.url				http://www.apache.org/licenses/LICENSE-2.0.html
+// @description				This is a API documentation of BE Park Ease
+// @BasePath					/
+// @securityDefinitions.apikey	AccessToken
+// @in							header
+// @name						Authorization
 func main() {
 	conf := config.Get()
 	rawLogs := logger.GetWithoutCaller("main-api")
@@ -73,8 +87,6 @@ func main() {
 		DocExpansion: "list",
 	}))
 
-	route := internal.NewRouter(app)
-
 	// repository
 	authRepository := repository.NewAuthRepository(db)
 
@@ -85,7 +97,11 @@ func main() {
 	baseHandler := handler.NewBaseHandler()
 	authHandler := handler.NewAuthHandler(authService)
 
+	// middleware
+	middleware := middleware.NewMiddleware(authRepository)
+
 	// router
+	route := internal.NewRouter(app, middleware)
 	route.BaseRoute(baseHandler)
 	route.AuthRoute(authHandler)
 

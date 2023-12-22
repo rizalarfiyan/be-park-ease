@@ -1,4 +1,18 @@
+basePath: /
 definitions:
+  middleware.AuthUserData:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/sql.UserRole'
+      status:
+        $ref: '#/definitions/sql.UserStatus'
+      username:
+        type: string
+    type: object
   request.AuthLoginRequest:
     properties:
       password:
@@ -16,8 +30,34 @@ definitions:
         example: Message!
         type: string
     type: object
+  sql.UserRole:
+    enum:
+    - admin
+    - karyawan
+    type: string
+    x-enum-varnames:
+    - UserRoleAdmin
+    - UserRoleKaryawan
+  sql.UserStatus:
+    enum:
+    - active
+    - banned
+    type: string
+    x-enum-varnames:
+    - UserStatusActive
+    - UserStatusBanned
 info:
-  contact: {}
+  contact:
+    email: rizal.arfiyan.23@gmail.com
+    name: Rizal Arfiyan
+    url: https://rizalrfiyan.com
+  description: This is a API documentation of BE Park Ease
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: BE Park Ease API
+  version: "1.0"
 paths:
   /:
     get:
@@ -66,4 +106,36 @@ paths:
       summary: Post Auth Login based on parameter
       tags:
       - auth
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Auth Me
+      operationId: get-auth-me
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/middleware.AuthUserData'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get Auth Me based on parameter
+      tags:
+      - auth
+securityDefinitions:
+  AccessToken:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

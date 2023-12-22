@@ -2,6 +2,7 @@ package internal
 
 import (
 	"be-park-ease/internal/handler"
+	"be-park-ease/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -13,11 +14,13 @@ type Router interface {
 
 type router struct {
 	app *fiber.App
+	mid middleware.Middleware
 }
 
-func NewRouter(app *fiber.App) Router {
+func NewRouter(app *fiber.App, middleware middleware.Middleware) Router {
 	return &router{
 		app: app,
+		mid: middleware,
 	}
 }
 
@@ -27,5 +30,6 @@ func (r *router) BaseRoute(handler handler.BaseHandler) {
 
 func (r *router) AuthRoute(handler handler.AuthHandler) {
 	auth := r.app.Group("/auth")
+	auth.Get("me", r.mid.Auth(false), handler.Me)
 	auth.Post("login", handler.Login)
 }

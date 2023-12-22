@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TYPE user_role AS ENUM ('admin', 'karyawan');
 
-CREATE TYPE user_status AS ENUM ('1', '2');
+CREATE TYPE user_status AS ENUM ('active', 'banned');
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     username varchar(20) UNIQUE NOT NULL,
     password varchar(255) NOT NULL,
     role user_role NOT NULL DEFAULT ('karyawan'),
-    status user_status NOT NULL DEFAULT ('1'),
+    status user_status NOT NULL DEFAULT ('active'),
     token varchar(255),
     expired_at timestamp,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

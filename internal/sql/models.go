@@ -65,8 +65,8 @@ func (e UserRole) Valid() bool {
 type UserStatus string
 
 const (
-	UserStatus1 UserStatus = "1"
-	UserStatus2 UserStatus = "2"
+	UserStatusActive UserStatus = "active"
+	UserStatusBanned UserStatus = "banned"
 )
 
 func (e *UserStatus) Scan(src interface{}) error {
@@ -106,8 +106,8 @@ func (ns NullUserStatus) Value() (driver.Value, error) {
 
 func (e UserStatus) Valid() bool {
 	switch e {
-	case UserStatus1,
-		UserStatus2:
+	case UserStatusActive,
+		UserStatusBanned:
 		return true
 	}
 	return false

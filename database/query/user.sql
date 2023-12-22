@@ -1,7 +1,7 @@
--- name: GetAllByUsername :one
+-- name: GetUserByUsername :one
 SELECT * FROM users WHERE username = $1 LIMIT 1;
 
--- name: GetAllByToken :one
+-- name: GetUserByToken :one
 SELECT * FROM users WHERE token = $1 LIMIT 1;
 
 -- name: UpdateUserToken :exec

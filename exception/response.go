@@ -14,12 +14,14 @@ import (
 )
 
 type Exception interface {
+	DefaultData(isList bool) interface{}
 	PanicIfError(err error, isList bool)
 	PanicIfErrorWithoutNoSqlResult(err error, isList bool)
 	IsNotFoundMessage(value interface{}, message string, isList bool)
 	IsNotFound(value interface{}, isList bool, modules ...string)
 	IsUnprocessableEntity(value interface{}, message string, isList bool)
 	IsBadRequest(value interface{}, message string, isList bool)
+	IsUnauthorize(message string, isList bool)
 }
 
 type exception struct {
@@ -32,7 +34,7 @@ func NewException(types string) Exception {
 	}
 }
 
-func (e *exception) defaultData(isList bool) interface{} {
+func (e *exception) DefaultData(isList bool) interface{} {
 	if isList {
 		return []any{}
 	}
@@ -49,13 +51,13 @@ func (e *exception) getCaller(skips ...int) string {
 	if !ok {
 		return ""
 	}
-	return fmt.Sprintf("%s:%d\n", file, line)
+	return fmt.Sprintf("%s:%d", file, line)
 
 }
 
 func (e *exception) PanicIfError(err error, isList bool) {
 	if err != nil {
-		data := e.defaultData(isList)
+		data := e.DefaultData(isList)
 		e.log.Error().Str("caller", e.getCaller()).Err(err).Msg("SERVER ERROR")
 		panic(response.NewErrorMessage(http.StatusInternalServerError, err.Error(), data))
 	}
@@ -63,7 +65,7 @@ func (e *exception) PanicIfError(err error, isList bool) {
 
 func (e *exception) PanicIfErrorWithoutNoSqlResult(err error, isList bool) {
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		data := e.defaultData(isList)
+		data := e.DefaultData(isList)
 		e.log.Error().Str("caller", e.getCaller()).Err(err).Msg("SERVER ERROR")
 		panic(response.NewErrorMessage(http.StatusInternalServerError, err.Error(), data))
 	}
@@ -71,7 +73,7 @@ func (e *exception) PanicIfErrorWithoutNoSqlResult(err error, isList bool) {
 
 func (e *exception) isEmptyCallback(value interface{}, isList bool, callback func(isList bool, data interface{}) *response.BaseResponse) {
 	if utils.IsEmptyAll(value) {
-		data := e.defaultData(isList)
+		data := e.DefaultData(isList)
 		panic(callback(isList, data))
 	}
 }
@@ -98,8 +100,14 @@ func (e *exception) IsUnprocessableEntity(value interface{}, message string, isL
 		return response.NewErrorMessage(http.StatusUnprocessableEntity, message, data)
 	})
 }
+
 func (e *exception) IsBadRequest(value interface{}, message string, isList bool) {
 	e.isEmptyCallback(value, isList, func(isList bool, data interface{}) *response.BaseResponse {
 		return response.NewErrorMessage(http.StatusBadRequest, message, data)
 	})
+}
+
+func (e *exception) IsUnauthorize(message string, isList bool) {
+	data := e.DefaultData(isList)
+	panic(response.NewErrorMessage(http.StatusInternalServerError, message, data))
 }

@@ -2,9 +2,11 @@ package handler
 
 import (
 	"be-park-ease/config"
+	"be-park-ease/exception"
 	"be-park-ease/internal/request"
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
+	"be-park-ease/middleware"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,17 +14,20 @@ import (
 
 type AuthHandler interface {
 	Login(ctx *fiber.Ctx) error
+	Me(ctx *fiber.Ctx) error
 }
 
 type authHandler struct {
-	conf    *config.Config
-	service service.AuthService
+	conf      *config.Config
+	service   service.AuthService
+	exception exception.Exception
 }
 
 func NewAuthHandler(service service.AuthService) AuthHandler {
 	return &authHandler{
-		conf:    config.Get(),
-		service: service,
+		conf:      config.Get(),
+		service:   service,
+		exception: exception.NewException("auth-handler"),
 	}
 }
 
@@ -45,12 +50,36 @@ func (h *authHandler) Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	// exception.ValidateStruct(*req, false)
+	//! FIXME validation with ozzo validation
 
 	res := h.service.Login(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
 		Data:    res,
+	})
+}
+
+// Auth Me godoc
+//
+//	@Summary		Get Auth Me based on parameter
+//	@Description	Auth Me
+//	@ID				get-auth-me
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Success		200	{object}	response.BaseResponse{data=middleware.AuthUserData}
+//	@Failure		500	{object}	response.BaseResponse
+//	@Router			/auth/me [get]
+func (h *authHandler) Me(ctx *fiber.Ctx) error {
+	user := middleware.AuthUserData{}
+	err := user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+		Data:    user,
 	})
 }

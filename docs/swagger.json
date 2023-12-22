@@ -1,8 +1,21 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is a API documentation of BE Park Ease",
+        "title": "BE Park Ease API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Rizal Arfiyan",
+            "url": "https://rizalrfiyan.com",
+            "email": "rizal.arfiyan.23@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
     },
+    "basePath": "/",
     "paths": {
         "/": {
             "get": {
@@ -74,9 +87,76 @@
                     }
                 }
             }
+        },
+        "/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Auth Me",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Get Auth Me based on parameter",
+                "operationId": "get-auth-me",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/middleware.AuthUserData"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "middleware.AuthUserData": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/sql.UserRole"
+                },
+                "status": {
+                    "$ref": "#/definitions/sql.UserStatus"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "request.AuthLoginRequest": {
             "type": "object",
             "properties": {
@@ -101,6 +181,35 @@
                     "example": "Message!"
                 }
             }
+        },
+        "sql.UserRole": {
+            "type": "string",
+            "enum": [
+                "admin",
+                "karyawan"
+            ],
+            "x-enum-varnames": [
+                "UserRoleAdmin",
+                "UserRoleKaryawan"
+            ]
+        },
+        "sql.UserStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "banned"
+            ],
+            "x-enum-varnames": [
+                "UserStatusActive",
+                "UserStatusBanned"
+            ]
+        }
+    },
+    "securityDefinitions": {
+        "AccessToken": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

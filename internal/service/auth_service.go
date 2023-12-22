@@ -31,7 +31,7 @@ func NewAuthService(repo repository.AuthRepository) AuthService {
 }
 
 func (s authService) Login(ctx context.Context, req request.AuthLoginRequest) response.AuthLoginResponse {
-	user, err := s.repo.GetAllByUsername(ctx, req.Username)
+	user, err := s.repo.GetUserByUsername(ctx, req.Username)
 	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
 	s.exception.IsBadRequest(user, "Invalid username or password", false)
 
@@ -39,7 +39,7 @@ func (s authService) Login(ctx context.Context, req request.AuthLoginRequest) re
 
 	s.exception.IsBadRequest(isValidPassword, "Invalid username or password", false)
 
-	isBanned := user.Status != sql.UserStatus2
+	isBanned := user.Status != sql.UserStatusBanned
 	s.exception.IsUnprocessableEntity(isBanned, "Your account has been disabled", false)
 
 	token := utils.GenerateToken(user.ID)

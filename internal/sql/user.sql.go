@@ -11,12 +11,12 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getAllByToken = `-- name: GetAllByToken :one
+const getUserByToken = `-- name: GetUserByToken :one
 SELECT id, name, username, password, role, status, token, expired_at, created_at, updated_at FROM users WHERE token = $1 LIMIT 1
 `
 
-func (q *Queries) GetAllByToken(ctx context.Context, token pgtype.Text) (User, error) {
-	row := q.db.QueryRow(ctx, getAllByToken, token)
+func (q *Queries) GetUserByToken(ctx context.Context, token pgtype.Text) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByToken, token)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -33,12 +33,12 @@ func (q *Queries) GetAllByToken(ctx context.Context, token pgtype.Text) (User, e
 	return i, err
 }
 
-const getAllByUsername = `-- name: GetAllByUsername :one
+const getUserByUsername = `-- name: GetUserByUsername :one
 SELECT id, name, username, password, role, status, token, expired_at, created_at, updated_at FROM users WHERE username = $1 LIMIT 1
 `
 
-func (q *Queries) GetAllByUsername(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRow(ctx, getAllByUsername, username)
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
 	var i User
 	err := row.Scan(
 		&i.ID,
