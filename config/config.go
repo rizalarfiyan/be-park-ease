@@ -51,6 +51,7 @@ func Init() {
 	conf.Swagger.Password = cc.AsString("SWAGGER_PASSWORD", "password")
 
 	conf.Auth.TokenSalt = cc.AsString("TOKEN_SALT", "")
+	conf.Auth.ExpiredDuration = cc.AsTimeDuration("TOKEN_EXPIRED_DURATION", 6*30*24*time.Hour)
 }
 
 func Get() *Config {

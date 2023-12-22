@@ -1,9 +1,14 @@
-version: "1"
-packages:
-  - name: "sql"
-    path: "internal/sql"
+version: "2"
+sql:
+  - engine: "postgresql"
     queries: "./database/query/"
     schema: "./database/schema/"
-    engine: "postgresql"
-    sql_package: "pgx/v5"
-    json_tags_case_style: "camel"
+    gen:
+      go:
+        package: "sql"
+        sql_package: "pgx/v5"
+        json_tags_case_style: "camel"
+        out: "./internal/sql"
+        omit_unused_structs: true
+        emit_enum_valid_method: true
+        emit_empty_slices: true

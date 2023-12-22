@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     password varchar(255) NOT NULL,
     role user_role NOT NULL DEFAULT ('karyawan'),
     status user_status NOT NULL DEFAULT ('1'),
-    token varchar(255) NOT NULL,
-    expired_at timestamp NOT NULL,
+    token varchar(255),
+    expired_at timestamp,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp
 );

@@ -53,5 +53,6 @@ type SwaggerConfigs struct {
 }
 
 type AuthConfigs struct {
-	TokenSalt string
+	TokenSalt       string
+	ExpiredDuration time.Duration
 }

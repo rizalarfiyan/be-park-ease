@@ -1,4 +1,11 @@
 definitions:
+  request.AuthLoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   response.BaseResponse:
     properties:
       code:
@@ -32,4 +39,31 @@ paths:
       summary: Get Base Home based on parameter
       tags:
       - home
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Auth Login
+      operationId: post-auth-login
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AuthLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Post Auth Login based on parameter
+      tags:
+      - auth
 swagger: "2.0"

@@ -2,12 +2,15 @@ package main
 
 import (
 	"be-park-ease/constants"
+	"be-park-ease/database"
 	_ "be-park-ease/docs"
 	"be-park-ease/exception"
 
 	"be-park-ease/config"
 	"be-park-ease/internal"
 	"be-park-ease/internal/handler"
+	"be-park-ease/internal/repository"
+	"be-park-ease/internal/service"
 	"be-park-ease/logger"
 	"context"
 	"fmt"
@@ -34,12 +37,20 @@ func init() {
 	conf := config.Get()
 	logger.Init(conf)
 	logger.UpdateLogLevel(conf.Logger.Level)
+
+	ctx := context.Background()
+	database.InitPostgres(ctx)
 }
 
 func main() {
 	conf := config.Get()
 	rawLogs := logger.GetWithoutCaller("main-api")
 	logs := rawLogs.With().Caller().Logger()
+
+	db := database.GetPostgres()
+	defer func() {
+		db.Close()
+	}()
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: exception.ErrorHandler,
@@ -64,11 +75,19 @@ func main() {
 
 	route := internal.NewRouter(app)
 
+	// repository
+	authRepository := repository.NewAuthRepository(db)
+
+	// servie
+	authService := service.NewAuthService(authRepository)
+
 	// handler
 	baseHandler := handler.NewBaseHandler()
+	authHandler := handler.NewAuthHandler(authService)
 
 	// router
 	route.BaseRoute(baseHandler)
+	route.AuthRoute(authHandler)
 
 	baseUrl := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	server := &http.Server{
