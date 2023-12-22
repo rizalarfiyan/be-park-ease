@@ -22,6 +22,7 @@ type Exception interface {
 	IsUnprocessableEntity(value interface{}, message string, isList bool)
 	IsBadRequest(value interface{}, message string, isList bool)
 	IsUnauthorize(message string, isList bool)
+	IsForbidden(message string, isList bool)
 }
 
 type exception struct {
@@ -110,4 +111,9 @@ func (e *exception) IsBadRequest(value interface{}, message string, isList bool)
 func (e *exception) IsUnauthorize(message string, isList bool) {
 	data := e.DefaultData(isList)
 	panic(response.NewErrorMessage(http.StatusInternalServerError, message, data))
+}
+
+func (e *exception) IsForbidden(message string, isList bool) {
+	data := e.DefaultData(isList)
+	panic(response.NewErrorMessage(http.StatusForbidden, message, data))
 }

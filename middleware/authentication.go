@@ -8,11 +8,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var (
-	MsgAuthExpired = "Token expired, please login again to continue."
-	MsgAuthDisable = "Your account has been disable, please contact administrator."
-)
-
 func (m *middleware) Auth(isList bool) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		token := ctx.Get("Authorization")
