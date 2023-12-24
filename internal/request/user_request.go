@@ -3,6 +3,7 @@ package request
 import (
 	"be-park-ease/constants"
 	"be-park-ease/internal/sql"
+	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -54,5 +55,22 @@ func (req UpdateUserRequest) Validate() error {
 		validation.Field(&req.Password, validation.When(req.Password != "", validation.Required, constants.ValidationPassword)),
 		validation.Field(&req.Role, validation.When(req.Role != "", validation.Required, validation.In(sql.UserRoleAdmin, sql.UserRoleKaryawan))),
 		validation.Field(&req.Status, validation.When(req.Status != "", validation.Required, validation.In(sql.UserStatusActive, sql.UserStatusBanned))),
+	)
+}
+
+type ChangePasswordRequest struct {
+	OldPassword          string `json:"old_password" example:"Password123@"`
+	Password             string `json:"password" example:"Password123@"`
+	PasswordConfirmation string `json:"password_confirmation" example:"Password123@"`
+	UserId               int32  `json:"-"`
+}
+
+func (req ChangePasswordRequest) Validate() error {
+	fmt.Println(req.Password)
+	fmt.Println(req.PasswordConfirmation)
+	return validation.ValidateStruct(&req,
+		validation.Field(&req.OldPassword, validation.Required),
+		validation.Field(&req.Password, validation.Required, constants.ValidationPassword),
+		validation.Field(&req.PasswordConfirmation, validation.Required, validation.In(req.Password).Error("the password not equal with Password")),
 	)
 }

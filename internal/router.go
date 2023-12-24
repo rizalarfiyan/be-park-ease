@@ -46,6 +46,7 @@ func (r *router) UserRoute(handler handler.UserHandler) {
 	user := r.app.Group("user")
 	user.Get("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.AllUser)
 	user.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateUser)
+	user.Post("change-password", r.mid.Auth(false), handler.ChangePassword)
 	user.Get(":id", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UserById)
 	user.Put(":id", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateUser)
 }

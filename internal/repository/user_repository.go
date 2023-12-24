@@ -15,6 +15,7 @@ type UserRepository interface {
 	GetUserById(ctx context.Context, id int32) (sql.User, error)
 	CreateUser(ctx context.Context, req sql.CreateUserParams) error
 	UpdateUser(ctx context.Context, req sql.UpdateUserParams) error
+	ChangePasswordUser(ctx context.Context, req sql.UpdatePasswordParams) error
 }
 
 type userRepository struct {
@@ -81,4 +82,8 @@ func (r *userRepository) CreateUser(ctx context.Context, req sql.CreateUserParam
 
 func (r *userRepository) UpdateUser(ctx context.Context, req sql.UpdateUserParams) error {
 	return r.query.UpdateUser(ctx, req)
+}
+
+func (r *userRepository) ChangePasswordUser(ctx context.Context, req sql.UpdatePasswordParams) error {
+	return r.query.UpdatePassword(ctx, req)
 }

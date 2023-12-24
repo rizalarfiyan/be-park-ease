@@ -24,6 +24,10 @@ values ($1, $2, $3, $4, $5);
 
 -- name: UpdateUser :exec
 UPDATE users
-SET name = $1, username = $2, password = COALESCE(password, $3), role = $4, status = $5, updated_at = CURRENT_TIMESTAMP
+SET name = $1, username = $2, password = $3, role = $4, status = $5, updated_at = CURRENT_TIMESTAMP
 WHERE id = $6;
 
+-- name: UpdatePassword :exec
+UPDATE users
+SET password = $1, updated_at = CURRENT_TIMESTAMP
+WHERE id = $2;

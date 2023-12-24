@@ -36,7 +36,6 @@ func (s authService) Login(ctx context.Context, req request.AuthLoginRequest) re
 	s.exception.IsBadRequest(user, "Invalid username or password", false)
 
 	isValidPassword := utils.ComparePassword(user.Password, req.Password)
-
 	s.exception.IsBadRequest(isValidPassword, "Invalid username or password", false)
 
 	isBanned := user.Status != sql.UserStatusBanned

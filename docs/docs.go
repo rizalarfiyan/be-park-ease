@@ -413,6 +413,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/change-password": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Post Change Password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Post Change Password User based on parameter",
+                "operationId": "post-change-password-user",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ChangePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{id}": {
             "get": {
                 "security": [
@@ -548,6 +594,23 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "request.ChangePasswordRequest": {
+            "type": "object",
+            "properties": {
+                "old_password": {
+                    "type": "string",
+                    "example": "Password123@"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "Password123@"
+                },
+                "password_confirmation": {
+                    "type": "string",
+                    "example": "Password123@"
                 }
             }
         },

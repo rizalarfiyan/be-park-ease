@@ -8,7 +8,9 @@ import (
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
 	"be-park-ease/internal/sql"
+	"be-park-ease/middleware"
 	"be-park-ease/utils"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
@@ -18,6 +20,7 @@ type UserHandler interface {
 	UserById(ctx *fiber.Ctx) error
 	CreateUser(ctx *fiber.Ctx) error
 	UpdateUser(ctx *fiber.Ctx) error
+	ChangePassword(ctx *fiber.Ctx) error
 }
 
 type userHandler struct {
@@ -166,6 +169,40 @@ func (h *userHandler) UpdateUser(ctx *fiber.Ctx) error {
 	h.exception.IsErrValidation(err, false)
 
 	h.service.UpdateUser(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+	})
+}
+
+// ChangePassword godoc
+//
+//	@Summary		Post Change Password User based on parameter
+//	@Description	Post Change Password
+//	@ID				post-change-password-user
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.ChangePasswordRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/user/change-password [post]
+func (h *userHandler) ChangePassword(ctx *fiber.Ctx) error {
+	req := new(request.ChangePasswordRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+
+	err = req.Validate()
+	fmt.Println(err)
+	h.exception.IsErrValidation(err, false)
+
+	h.service.ChangePassword(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",

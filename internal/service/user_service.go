@@ -8,6 +8,7 @@ import (
 	"be-park-ease/internal/request"
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/sql"
+	"be-park-ease/utils"
 	"context"
 	"errors"
 	"github.com/jackc/pgerrcode"
@@ -19,6 +20,7 @@ type UserService interface {
 	UserById(ctx context.Context, userId int32) response.User
 	CreateUser(ctx context.Context, req request.CreateUserRequest)
 	UpdateUser(ctx context.Context, req request.UpdateUserRequest)
+	ChangePassword(ctx context.Context, req request.ChangePasswordRequest)
 }
 
 type userService struct {
@@ -138,5 +140,26 @@ func (s *userService) UpdateUser(ctx context.Context, req request.UpdateUserRequ
 
 	err = s.repo.UpdateUser(ctx, payload)
 	s.handleErrorUniqueUser(err, false)
+	s.exception.PanicIfError(err, false)
+}
+
+func (s *userService) ChangePassword(ctx context.Context, req request.ChangePasswordRequest) {
+	user, err := s.repo.GetUserById(ctx, req.UserId)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	s.exception.IsUnprocessableEntity(user, "Ops... Something wrong for your request", false)
+
+	isValidPassword := utils.ComparePassword(user.Password, req.OldPassword)
+	s.exception.IsBadRequest(isValidPassword, "Old password doesn't match", false)
+	s.exception.IsBadRequest(req.OldPassword != req.Password, "Password must be update from old password", false)
+
+	password, err := utils.HashPassword(req.Password)
+	s.exception.PanicIfError(err, false)
+
+	payload := sql.UpdatePasswordParams{
+		Password: password,
+		ID:       req.UserId,
+	}
+
+	err = s.repo.ChangePasswordUser(ctx, payload)
 	s.exception.PanicIfError(err, false)
 }

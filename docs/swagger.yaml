@@ -20,6 +20,18 @@ definitions:
       username:
         type: string
     type: object
+  request.ChangePasswordRequest:
+    properties:
+      old_password:
+        example: Password123@
+        type: string
+      password:
+        example: Password123@
+        type: string
+      password_confirmation:
+        example: Password123@
+        type: string
+    type: object
   request.CreateUserRequest:
     properties:
       name:
@@ -466,6 +478,35 @@ paths:
       security:
       - AccessToken: []
       summary: Post Update User based on parameter
+      tags:
+      - user
+  /user/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Post Change Password
+      operationId: post-change-password-user
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Change Password User based on parameter
       tags:
       - user
 securityDefinitions:
