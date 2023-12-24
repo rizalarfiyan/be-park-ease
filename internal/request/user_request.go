@@ -1,6 +1,7 @@
 package request
 
 import (
+	"be-park-ease/constants"
 	"be-park-ease/internal/sql"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -34,8 +35,8 @@ type CreateUserRequest struct {
 func (req CreateUserRequest) Validate() error {
 	return validation.ValidateStruct(&req,
 		validation.Field(&req.Name, validation.Required, validation.Length(5, 100)),
-		validation.Field(&req.Username, validation.Required, validation.Length(5, 20)),
-		validation.Field(&req.Password, validation.Required, validation.Length(5, 30)),
+		validation.Field(&req.Username, validation.Required, constants.ValidationUsername),
+		validation.Field(&req.Password, validation.Required, constants.ValidationPassword),
 		validation.Field(&req.Role, validation.Required, validation.In(sql.UserRoleAdmin, sql.UserRoleKaryawan)),
 		validation.Field(&req.Status, validation.Required, validation.In(sql.UserStatusActive, sql.UserStatusBanned)),
 	)
