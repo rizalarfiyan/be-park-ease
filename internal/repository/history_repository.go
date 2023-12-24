@@ -13,7 +13,7 @@ import (
 )
 
 type HistoryRepository interface {
-	GetAllEntryHistory(ctx context.Context, req request.AllHistoryRequest) (*model.ContentPagination[sql.GetAllEntryHistoryRow], error)
+	GetAllHistory(ctx context.Context, req request.AllHistoryRequest) (*model.ContentPagination[sql.GetAllHistoryRow], error)
 }
 
 type historyRepository struct {
@@ -30,8 +30,8 @@ func NewHistoryRepository(db *pgxpool.Pool) HistoryRepository {
 	}
 }
 
-func (r historyRepository) GetAllEntryHistory(ctx context.Context, req request.AllHistoryRequest) (*model.ContentPagination[sql.GetAllEntryHistoryRow], error) {
-	var res model.ContentPagination[sql.GetAllEntryHistoryRow]
+func (r historyRepository) GetAllHistory(ctx context.Context, req request.AllHistoryRequest) (*model.ContentPagination[sql.GetAllHistoryRow], error) {
+	var res model.ContentPagination[sql.GetAllHistoryRow]
 
 	baseBuilder := func(b *utils.QueryBuilder) {
 		switch req.HistoryType {
@@ -56,7 +56,7 @@ func (r historyRepository) GetAllEntryHistory(ctx context.Context, req request.A
 		}
 	}
 
-	entryHistory, err := r.queryBuilder.GetAllEntryHistory(utils.QueryBuild(ctx, func(b *utils.QueryBuilder) {
+	entryHistory, err := r.queryBuilder.GetAllHistory(utils.QueryBuild(ctx, func(b *utils.QueryBuilder) {
 		baseBuilder(b)
 		if req.OrderBy != "" && req.Order != "" {
 			b.Ordering(req.OrderBy, req.Order)
@@ -69,7 +69,7 @@ func (r historyRepository) GetAllEntryHistory(ctx context.Context, req request.A
 		return nil, err
 	}
 
-	count, err := r.queryBuilder.CountAllEntryHistory(utils.QueryBuild(ctx, baseBuilder))
+	count, err := r.queryBuilder.CountAllHistory(utils.QueryBuild(ctx, baseBuilder))
 	if err != nil {
 		return nil, err
 	}

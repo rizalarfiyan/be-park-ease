@@ -11,20 +11,20 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const countAllEntryHistory = `-- name: CountAllEntryHistory :one
+const countAllHistory = `-- name: CountAllHistory :one
 select COUNT(*) from entry_history eh
 LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
 LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
 `
 
-func (q *Queries) CountAllEntryHistory(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countAllEntryHistory)
+func (q *Queries) CountAllHistory(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAllHistory)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
-const getAllEntryHistory = `-- name: GetAllEntryHistory :many
+const getAllHistory = `-- name: GetAllHistory :many
 select eh.id, eh.location_code, eh.vehicle_type_code, eh.vehicle_number, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
        CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
 from entry_history eh
@@ -32,7 +32,7 @@ LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
 LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
 `
 
-type GetAllEntryHistoryRow struct {
+type GetAllHistoryRow struct {
 	ID              string
 	LocationCode    string
 	VehicleTypeCode string
@@ -41,15 +41,15 @@ type GetAllEntryHistoryRow struct {
 	Type            string
 }
 
-func (q *Queries) GetAllEntryHistory(ctx context.Context) ([]GetAllEntryHistoryRow, error) {
-	rows, err := q.db.Query(ctx, getAllEntryHistory)
+func (q *Queries) GetAllHistory(ctx context.Context) ([]GetAllHistoryRow, error) {
+	rows, err := q.db.Query(ctx, getAllHistory)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []GetAllEntryHistoryRow{}
+	items := []GetAllHistoryRow{}
 	for rows.Next() {
-		var i GetAllEntryHistoryRow
+		var i GetAllHistoryRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.LocationCode,

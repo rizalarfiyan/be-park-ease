@@ -31,7 +31,7 @@ func NewHistoryService(repo repository.HistoryRepository) HistoryService {
 }
 
 func (s *historyService) AllHistory(ctx context.Context, req request.AllHistoryRequest) response.BaseResponsePagination[response.EntryHistory] {
-	data, err := s.repo.GetAllEntryHistory(ctx, req)
+	data, err := s.repo.GetAllHistory(ctx, req)
 	s.exception.PanicIfError(err, true)
 	s.exception.IsNotFound(data, true)
 
