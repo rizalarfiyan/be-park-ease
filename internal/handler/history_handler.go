@@ -1,0 +1,85 @@
+package handler
+
+import (
+	"be-park-ease/config"
+	"be-park-ease/constants"
+	"be-park-ease/exception"
+	"be-park-ease/internal/request"
+	"be-park-ease/internal/response"
+	"be-park-ease/internal/service"
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type HistoryHandler interface {
+	AllHistory(ctx *fiber.Ctx) error
+}
+
+type historyHandler struct {
+	conf      *config.Config
+	service   service.HistoryService
+	exception exception.Exception
+}
+
+func NewHistoryHandler(service service.HistoryService) HistoryHandler {
+	return &historyHandler{
+		conf:      config.Get(),
+		service:   service,
+		exception: exception.NewException("history-handler"),
+	}
+}
+
+// AllHistory godoc
+//
+//	@Summary		Get All History based on parameter
+//	@Description	All History
+//	@ID				get-all-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			page			query		int		false	"Page"	default(1)
+//	@Param			limit			query		int		false	"Limit"	default(10)
+//	@Param			search			query		string	false	"Search"
+//	@Param			order_by		query		string	false	"Order by"	Enums(id,location_code,vehicle_type_code,vehicle_number,date,type)
+//	@Param			order			query		string	false	"Order"		Enums(asc, desc)
+//	@Param			type			query		string	false	"Type"		Enums(entry,exit,fine)
+//	@Param			vehicle_type	query		string	false	"Vehicle Type"
+//	@Param			location		query		string	false	"Location"
+//	@Success		200				{object}	response.BaseResponse{data=response.BaseResponsePagination[response.EntryHistory]}
+//	@Failure		500				{object}	response.BaseResponse
+//	@Router			/history/entry [get]
+func (h *historyHandler) AllHistory(ctx *fiber.Ctx) error {
+	req := request.AllHistoryRequest{
+		BasePagination: request.BasePagination{
+			Page:    ctx.QueryInt("page", 1),
+			Limit:   ctx.QueryInt("limit", constants.DefaultPageLimit),
+			Search:  ctx.Query("search"),
+			OrderBy: ctx.Query("order_by"),
+			Order:   ctx.Query("order"),
+		},
+		HistoryType: constants.HistoryType(ctx.Query("type")),
+		VehicleType: ctx.Query("vehicle_type"),
+		Location:    ctx.Query("location"),
+	}
+
+	fieldOrder := map[string]string{
+		"id":                "eh.id",
+		"location_code":     "eh.location_code",
+		"vehicle_type_code": "eh.vehicle_type_code",
+		"vehicle_number":    "eh.vehicle_number",
+		"date":              "date",
+		"type":              "type",
+	}
+
+	req.ValidateAndUpdateOrderBy(fieldOrder)
+	req.Normalize()
+
+	res := h.service.AllHistory(ctx.Context(), req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+		Data:    res,
+	})
+}

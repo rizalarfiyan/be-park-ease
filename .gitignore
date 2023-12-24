@@ -144,3 +144,6 @@ logs/
 
 ### dotenv ###
 .env
+
+### development ###
+database/sql/
