@@ -10,7 +10,7 @@ type AllHistoryRequest struct {
 }
 
 func (r *AllHistoryRequest) Normalize() {
-	if !r.HistoryType.IsValid() && r.HistoryType != "" {
+	if r.HistoryType != "" && !r.HistoryType.IsValid() {
 		r.HistoryType = constants.HistoryTypeEntry
 	}
 
