@@ -45,4 +45,5 @@ func (r *router) HistoryRoute(handler handler.HistoryHandler) {
 func (r *router) UserRoute(handler handler.UserHandler) {
 	user := r.app.Group("user")
 	user.Get("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.AllUser)
+	user.Get(":id", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UserById)
 }

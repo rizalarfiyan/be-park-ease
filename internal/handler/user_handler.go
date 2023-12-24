@@ -8,12 +8,14 @@ import (
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
 	"be-park-ease/internal/sql"
+	"be-park-ease/utils"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
 type UserHandler interface {
 	AllUser(ctx *fiber.Ctx) error
+	UserById(ctx *fiber.Ctx) error
 }
 
 type userHandler struct {
@@ -73,6 +75,32 @@ func (h *userHandler) AllUser(ctx *fiber.Ctx) error {
 	req.Normalize()
 
 	res := h.service.AllUser(ctx.Context(), req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+		Data:    res,
+	})
+}
+
+// UserById godoc
+//
+//	@Summary		Get User By ID based on parameter
+//	@Description	User By ID
+//	@ID				get-user-by-id
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			id	path		int	false	"ID"
+//	@Success		200	{object}	response.BaseResponse{data=response.User}
+//	@Failure		500	{object}	response.BaseResponse
+//	@Router			/user/{id} [get]
+func (h *userHandler) UserById(ctx *fiber.Ctx) error {
+	userIdStr := ctx.Params("id")
+	userid, err := utils.StrToInt(userIdStr)
+	h.exception.IsBadRequestErr(err, "Invalid user id", true)
+
+	res := h.service.UserById(ctx.Context(), int32(userid))
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",

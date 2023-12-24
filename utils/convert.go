@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,4 +24,8 @@ func PGText(text string) pgtype.Text {
 		String: text,
 		Valid:  text != "",
 	}
+}
+
+func StrToInt(str string) (int, error) {
+	return strconv.Atoi(str)
 }

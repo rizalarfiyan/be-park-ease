@@ -21,7 +21,8 @@ type Exception interface {
 	IsNotFound(value interface{}, isList bool, modules ...string)
 	IsUnprocessableEntity(value interface{}, message string, isList bool)
 	IsBadRequest(value interface{}, message string, isList bool)
-	IsUnauthorize(message string, isList bool)
+	IsBadRequestErr(err error, message string, isList bool)
+	IsUnauthorized(message string, isList bool)
 	IsForbidden(message string, isList bool)
 }
 
@@ -108,7 +109,13 @@ func (e *exception) IsBadRequest(value interface{}, message string, isList bool)
 	})
 }
 
-func (e *exception) IsUnauthorize(message string, isList bool) {
+func (e *exception) IsBadRequestErr(err error, message string, isList bool) {
+	if err != nil {
+		e.IsBadRequest(nil, message, isList)
+	}
+}
+
+func (e *exception) IsUnauthorized(message string, isList bool) {
 	data := e.DefaultData(isList)
 	panic(response.NewErrorMessage(http.StatusInternalServerError, message, data))
 }

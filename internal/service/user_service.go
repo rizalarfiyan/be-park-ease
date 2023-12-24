@@ -12,6 +12,7 @@ import (
 
 type UserService interface {
 	AllUser(ctx context.Context, req request.AllUserRequest) response.BaseResponsePagination[response.User]
+	UserById(ctx context.Context, userId int32) response.User
 }
 
 type userService struct {
@@ -49,4 +50,18 @@ func (s *userService) AllUser(ctx context.Context, req request.AllUserRequest) r
 	}
 
 	return response.WithPagination[response.User](content, req.BasePagination)
+}
+
+func (s *userService) UserById(ctx context.Context, userId int32) response.User {
+	data, err := s.repo.GetUserById(ctx, userId)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	s.exception.IsNotFound(data, false)
+
+	return response.User{
+		ID:       data.ID,
+		Username: data.Username,
+		Name:     data.Name,
+		Role:     data.Role,
+		Status:   data.Status,
+	}
 }

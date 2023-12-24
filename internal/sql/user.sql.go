@@ -57,6 +57,28 @@ func (q *Queries) GetAllUser(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
+const getUserById = `-- name: GetUserById :one
+SELECT id, name, username, password, role, status, token, expired_at, created_at, updated_at FROM users WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Username,
+		&i.Password,
+		&i.Role,
+		&i.Status,
+		&i.Token,
+		&i.ExpiredAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getUserByToken = `-- name: GetUserByToken :one
 SELECT id, name, username, password, role, status, token, expired_at, created_at, updated_at FROM users WHERE token = $1 LIMIT 1
 `

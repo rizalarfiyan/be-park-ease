@@ -12,6 +12,7 @@ import (
 
 type UserRepository interface {
 	GetAllUsers(ctx context.Context, req request.AllUserRequest) (*model.ContentPagination[sql.User], error)
+	GetUserById(ctx context.Context, id int32) (sql.User, error)
 }
 
 type userRepository struct {
@@ -66,4 +67,8 @@ func (r *userRepository) GetAllUsers(ctx context.Context, req request.AllUserReq
 	res.Content = entryHistory
 	res.Count = count
 	return &res, nil
+}
+
+func (r *userRepository) GetUserById(ctx context.Context, id int32) (sql.User, error) {
+	return r.query.GetUserById(ctx, id)
 }
