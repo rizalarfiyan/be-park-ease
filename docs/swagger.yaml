@@ -20,6 +20,26 @@ definitions:
       username:
         type: string
     type: object
+  request.CreateUserRequest:
+    properties:
+      name:
+        example: Paijo Royo Royo
+        type: string
+      password:
+        example: password
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/sql.UserRole'
+        example: karyawan
+      status:
+        allOf:
+        - $ref: '#/definitions/sql.UserStatus'
+        example: active
+      username:
+        example: paijo
+        type: string
+    type: object
   response.BaseMetadataPagination:
     properties:
       page:
@@ -334,6 +354,34 @@ paths:
       security:
       - AccessToken: []
       summary: Get All User based on parameter
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Create User
+      operationId: post-create-user
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create User based on parameter
       tags:
       - user
   /user/{id}:

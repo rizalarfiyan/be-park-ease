@@ -2,6 +2,7 @@ package request
 
 import (
 	"be-park-ease/internal/sql"
+	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 type AllUserRequest struct {
@@ -20,4 +21,22 @@ func (r *AllUserRequest) Normalize() {
 	}
 
 	r.BasePagination.Normalize()
+}
+
+type CreateUserRequest struct {
+	Username string         `json:"username" example:"paijo"`
+	Password string         `json:"password" example:"password"`
+	Name     string         `json:"name" example:"Paijo Royo Royo"`
+	Role     sql.UserRole   `json:"role" example:"karyawan"`
+	Status   sql.UserStatus `json:"status" example:"active"`
+}
+
+func (req CreateUserRequest) Validate() error {
+	return validation.ValidateStruct(&req,
+		validation.Field(&req.Name, validation.Required, validation.Length(5, 100)),
+		validation.Field(&req.Username, validation.Required, validation.Length(5, 20)),
+		validation.Field(&req.Password, validation.Required, validation.Length(5, 30)),
+		validation.Field(&req.Role, validation.Required, validation.In(sql.UserRoleAdmin, sql.UserRoleKaryawan)),
+		validation.Field(&req.Status, validation.Required, validation.In(sql.UserStatusActive, sql.UserStatusBanned)),
+	)
 }

@@ -22,6 +22,30 @@ func (q *Queries) CountAllUser(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const createUser = `-- name: CreateUser :exec
+insert into users (name, username, password, role, status)
+values ($1, $2, $3, $4, $5)
+`
+
+type CreateUserParams struct {
+	Name     string
+	Username string
+	Password string
+	Role     UserRole
+	Status   UserStatus
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.Exec(ctx, createUser,
+		arg.Name,
+		arg.Username,
+		arg.Password,
+		arg.Role,
+		arg.Status,
+	)
+	return err
+}
+
 const getAllUser = `-- name: GetAllUser :many
 select id, name, username, password, role, status, token, expired_at, created_at, updated_at from users
 `

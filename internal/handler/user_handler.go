@@ -16,6 +16,7 @@ import (
 type UserHandler interface {
 	AllUser(ctx *fiber.Ctx) error
 	UserById(ctx *fiber.Ctx) error
+	CreateUser(ctx *fiber.Ctx) error
 }
 
 type userHandler struct {
@@ -105,5 +106,35 @@ func (h *userHandler) UserById(ctx *fiber.Ctx) error {
 		Code:    http.StatusOK,
 		Message: "Success!",
 		Data:    res,
+	})
+}
+
+// CreateUser godoc
+//
+//	@Summary		Post Create User based on parameter
+//	@Description	Create User
+//	@ID				post-create-user
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CreateUserRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/user [post]
+func (h *userHandler) CreateUser(ctx *fiber.Ctx) error {
+	req := new(request.CreateUserRequest)
+	err := ctx.BodyParser(req)
+	if err != nil {
+		return err
+	}
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, true)
+
+	h.service.CreateUser(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
 	})
 }

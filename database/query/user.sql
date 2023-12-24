@@ -17,3 +17,7 @@ SELECT COUNT(*) FROM users;
 
 -- name: GetUserById :one
 SELECT * FROM users WHERE id = $1 LIMIT 1;
+
+-- name: CreateUser :exec
+insert into users (name, username, password, role, status)
+values ($1, $2, $3, $4, $5);

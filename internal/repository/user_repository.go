@@ -13,6 +13,7 @@ import (
 type UserRepository interface {
 	GetAllUsers(ctx context.Context, req request.AllUserRequest) (*model.ContentPagination[sql.User], error)
 	GetUserById(ctx context.Context, id int32) (sql.User, error)
+	CreateUser(ctx context.Context, user sql.CreateUserParams) error
 }
 
 type userRepository struct {
@@ -71,4 +72,8 @@ func (r *userRepository) GetAllUsers(ctx context.Context, req request.AllUserReq
 
 func (r *userRepository) GetUserById(ctx context.Context, id int32) (sql.User, error) {
 	return r.query.GetUserById(ctx, id)
+}
+
+func (r *userRepository) CreateUser(ctx context.Context, user sql.CreateUserParams) error {
+	return r.query.CreateUser(ctx, user)
 }

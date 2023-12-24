@@ -7,12 +7,17 @@ import (
 	"be-park-ease/internal/repository"
 	"be-park-ease/internal/request"
 	"be-park-ease/internal/response"
+	"be-park-ease/internal/sql"
 	"context"
+	"errors"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type UserService interface {
 	AllUser(ctx context.Context, req request.AllUserRequest) response.BaseResponsePagination[response.User]
 	UserById(ctx context.Context, userId int32) response.User
+	CreateUser(ctx context.Context, req request.CreateUserRequest)
 }
 
 type userService struct {
@@ -64,4 +69,34 @@ func (s *userService) UserById(ctx context.Context, userId int32) response.User 
 		Role:     data.Role,
 		Status:   data.Status,
 	}
+}
+
+func (s *userService) handleErrorUniqueUser(err error, isList bool) {
+	var pgErr *pgconn.PgError
+	ok := errors.As(err, &pgErr)
+	if !ok {
+		return
+	}
+
+	if pgErr.Code != pgerrcode.UniqueViolation {
+		return
+	}
+
+	switch pgErr.ConstraintName {
+	case "users_username_key":
+		s.exception.IsBadRequestMessage("Username already exist.", isList)
+	}
+}
+
+func (s *userService) CreateUser(ctx context.Context, req request.CreateUserRequest) {
+	payload := sql.CreateUserParams{
+		Username: req.Username,
+		Password: req.Password,
+		Name:     req.Name,
+		Role:     req.Role,
+		Status:   req.Status,
+	}
+	err := s.repo.CreateUser(ctx, payload)
+	s.handleErrorUniqueUser(err, false)
+	s.exception.PanicIfError(err, false)
 }
