@@ -20,6 +20,15 @@ definitions:
       username:
         type: string
     type: object
+  response.BaseMetadataPagination:
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+    type: object
   response.BaseResponse:
     properties:
       code:
@@ -28,6 +37,30 @@ definitions:
       data: {}
       message:
         example: Message!
+        type: string
+    type: object
+  response.BaseResponsePagination-response_EntryHistory:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/response.EntryHistory'
+        type: array
+      metadata:
+        $ref: '#/definitions/response.BaseMetadataPagination'
+    type: object
+  response.EntryHistory:
+    properties:
+      date:
+        type: string
+      id:
+        type: string
+      location_code:
+        type: string
+      type:
+        type: string
+      vehicle_number:
+        type: string
+      vehicle_type_code:
         type: string
     type: object
   sql.UserRole:
@@ -133,6 +166,82 @@ paths:
       summary: Get Auth Me based on parameter
       tags:
       - auth
+  /history/entry:
+    get:
+      consumes:
+      - application/json
+      description: All History
+      operationId: get-all-history
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Order by
+        enum:
+        - id
+        - location_code
+        - vehicle_type_code
+        - vehicle_number
+        - date
+        - type
+        in: query
+        name: order_by
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      - description: Type
+        enum:
+        - entry
+        - exit
+        - fine
+        in: query
+        name: type
+        type: string
+      - description: Vehicle Type
+        in: query
+        name: vehicle_type
+        type: string
+      - description: Location
+        in: query
+        name: location
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.BaseResponsePagination-response_EntryHistory'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get All History based on parameter
+      tags:
+      - history
 securityDefinitions:
   AccessToken:
     in: header
