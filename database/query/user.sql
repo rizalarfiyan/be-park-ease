@@ -8,3 +8,9 @@ SELECT * FROM users WHERE token = $1 LIMIT 1;
 UPDATE users
 SET token = $1, expired_at = $2, updated_at = CURRENT_TIMESTAMP
 WHERE id = $3;
+
+-- name: GetAllUser :many
+select * from users;
+
+-- name: CountAllUser :one
+SELECT COUNT(*) FROM users;
