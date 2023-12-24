@@ -46,9 +46,7 @@ func NewAuthHandler(service service.AuthService) AuthHandler {
 func (h *authHandler) Login(ctx *fiber.Ctx) error {
 	req := new(request.AuthLoginRequest)
 	err := ctx.BodyParser(req)
-	if err != nil {
-		return err
-	}
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
 
 	err = req.Validate()
 	h.exception.IsErrValidation(err, true)

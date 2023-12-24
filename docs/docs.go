@@ -435,7 +435,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID",
+                        "description": "User ID",
                         "name": "id",
                         "in": "path"
                     }
@@ -457,6 +457,56 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Update User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Post Update User based on parameter",
+                "operationId": "put-update-user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
                         }
                     },
                     "500": {
@@ -502,6 +552,39 @@ const docTemplate = `{
             }
         },
         "request.CreateUserRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Paijo Royo Royo"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "role": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/sql.UserRole"
+                        }
+                    ],
+                    "example": "karyawan"
+                },
+                "status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/sql.UserStatus"
+                        }
+                    ],
+                    "example": "active"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "paijo"
+                }
+            }
+        },
+        "request.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "name": {

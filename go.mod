@@ -3,7 +3,7 @@ module be-park-ease
 go 1.21.0
 
 require (
-	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gofiber/contrib/fiberzerolog v0.2.3
 	github.com/gofiber/fiber/v2 v2.51.0
 	github.com/gofiber/swagger v0.1.14
@@ -13,6 +13,7 @@ require (
 	github.com/rs/zerolog v1.31.0
 	github.com/swaggo/swag v1.16.2
 	golang.org/x/crypto v0.9.0
+	golang.org/x/text v0.9.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -46,7 +47,6 @@ require (
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

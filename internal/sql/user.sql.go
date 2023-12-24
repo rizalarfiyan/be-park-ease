@@ -147,6 +147,33 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	return i, err
 }
 
+const updateUser = `-- name: UpdateUser :exec
+UPDATE users
+SET name = $1, username = $2, password = COALESCE(password, $3), role = $4, status = $5, updated_at = CURRENT_TIMESTAMP
+WHERE id = $6
+`
+
+type UpdateUserParams struct {
+	Name     string
+	Username string
+	Password string
+	Role     UserRole
+	Status   UserStatus
+	ID       int32
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.db.Exec(ctx, updateUser,
+		arg.Name,
+		arg.Username,
+		arg.Password,
+		arg.Role,
+		arg.Status,
+		arg.ID,
+	)
+	return err
+}
+
 const updateUserToken = `-- name: UpdateUserToken :exec
 UPDATE users
 SET token = $1, expired_at = $2, updated_at = CURRENT_TIMESTAMP

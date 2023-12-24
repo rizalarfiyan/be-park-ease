@@ -17,6 +17,7 @@ type UserHandler interface {
 	AllUser(ctx *fiber.Ctx) error
 	UserById(ctx *fiber.Ctx) error
 	CreateUser(ctx *fiber.Ctx) error
+	UpdateUser(ctx *fiber.Ctx) error
 }
 
 type userHandler struct {
@@ -92,14 +93,14 @@ func (h *userHandler) AllUser(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Security		AccessToken
-//	@Param			id	path		int	false	"ID"
+//	@Param			id	path		int	false	"User ID"
 //	@Success		200	{object}	response.BaseResponse{data=response.User}
 //	@Failure		500	{object}	response.BaseResponse
 //	@Router			/user/{id} [get]
 func (h *userHandler) UserById(ctx *fiber.Ctx) error {
 	userIdStr := ctx.Params("id")
 	userid, err := utils.StrToInt(userIdStr)
-	h.exception.IsBadRequestErr(err, "Invalid user id", true)
+	h.exception.IsBadRequestErr(err, "Invalid user id", false)
 
 	res := h.service.UserById(ctx.Context(), int32(userid))
 	return ctx.JSON(response.BaseResponse{
@@ -125,14 +126,46 @@ func (h *userHandler) UserById(ctx *fiber.Ctx) error {
 func (h *userHandler) CreateUser(ctx *fiber.Ctx) error {
 	req := new(request.CreateUserRequest)
 	err := ctx.BodyParser(req)
-	if err != nil {
-		return err
-	}
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
 
 	err = req.Validate()
-	h.exception.IsErrValidation(err, true)
+	h.exception.IsErrValidation(err, false)
 
 	h.service.CreateUser(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+	})
+}
+
+// UpdateUser godoc
+//
+//	@Summary		Post Update User based on parameter
+//	@Description	Update User
+//	@ID				put-update-user
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			id		path		int							false	"User ID"
+//	@Param			data	body		request.UpdateUserRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/user/{id} [put]
+func (h *userHandler) UpdateUser(ctx *fiber.Ctx) error {
+	req := new(request.UpdateUserRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	userIdStr := ctx.Params("id")
+	userid, err := utils.StrToInt(userIdStr)
+	h.exception.IsBadRequestErr(err, "Invalid user id", false)
+	req.UserId = int32(userid)
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	h.service.UpdateUser(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",

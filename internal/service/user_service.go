@@ -18,6 +18,7 @@ type UserService interface {
 	AllUser(ctx context.Context, req request.AllUserRequest) response.BaseResponsePagination[response.User]
 	UserById(ctx context.Context, userId int32) response.User
 	CreateUser(ctx context.Context, req request.CreateUserRequest)
+	UpdateUser(ctx context.Context, req request.UpdateUserRequest)
 }
 
 type userService struct {
@@ -97,6 +98,45 @@ func (s *userService) CreateUser(ctx context.Context, req request.CreateUserRequ
 		Status:   req.Status,
 	}
 	err := s.repo.CreateUser(ctx, payload)
+	s.handleErrorUniqueUser(err, false)
+	s.exception.PanicIfError(err, false)
+}
+
+func (s *userService) UpdateUser(ctx context.Context, req request.UpdateUserRequest) {
+	data, err := s.repo.GetUserById(ctx, req.UserId)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	s.exception.IsNotFound(data, false)
+
+	payload := sql.UpdateUserParams{
+		Name:     data.Name,
+		Username: data.Username,
+		Password: data.Password,
+		Role:     data.Role,
+		Status:   data.Status,
+		ID:       req.UserId,
+	}
+
+	if req.Username != "" {
+		payload.Username = req.Username
+	}
+
+	if req.Password != "" {
+		payload.Password = req.Password
+	}
+
+	if req.Name != "" {
+		payload.Name = req.Name
+	}
+
+	if req.Role != "" {
+		payload.Role = req.Role
+	}
+
+	if req.Status != "" {
+		payload.Status = req.Status
+	}
+
+	err = s.repo.UpdateUser(ctx, payload)
 	s.handleErrorUniqueUser(err, false)
 	s.exception.PanicIfError(err, false)
 }

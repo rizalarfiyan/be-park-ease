@@ -40,6 +40,26 @@ definitions:
         example: paijo
         type: string
     type: object
+  request.UpdateUserRequest:
+    properties:
+      name:
+        example: Paijo Royo Royo
+        type: string
+      password:
+        example: password
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/sql.UserRole'
+        example: karyawan
+      status:
+        allOf:
+        - $ref: '#/definitions/sql.UserStatus'
+        example: active
+      username:
+        example: paijo
+        type: string
+    type: object
   response.BaseMetadataPagination:
     properties:
       page:
@@ -391,7 +411,7 @@ paths:
       description: User By ID
       operationId: get-user-by-id
       parameters:
-      - description: ID
+      - description: User ID
         in: path
         name: id
         type: integer
@@ -414,6 +434,38 @@ paths:
       security:
       - AccessToken: []
       summary: Get User By ID based on parameter
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update User
+      operationId: put-update-user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        type: integer
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Update User based on parameter
       tags:
       - user
 securityDefinitions:

@@ -47,4 +47,5 @@ func (r *router) UserRoute(handler handler.UserHandler) {
 	user.Get("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.AllUser)
 	user.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateUser)
 	user.Get(":id", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UserById)
+	user.Put(":id", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateUser)
 }

@@ -2,7 +2,7 @@ package request
 
 import (
 	"be-park-ease/constants"
-	validation "github.com/go-ozzo/ozzo-validation"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type AuthLoginRequest struct {

@@ -21,3 +21,9 @@ SELECT * FROM users WHERE id = $1 LIMIT 1;
 -- name: CreateUser :exec
 insert into users (name, username, password, role, status)
 values ($1, $2, $3, $4, $5);
+
+-- name: UpdateUser :exec
+UPDATE users
+SET name = $1, username = $2, password = COALESCE(password, $3), role = $4, status = $5, updated_at = CURRENT_TIMESTAMP
+WHERE id = $6;
+
