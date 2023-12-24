@@ -135,7 +135,7 @@
                 }
             }
         },
-        "/history/entry": {
+        "/history": {
             "get": {
                 "security": [
                     {

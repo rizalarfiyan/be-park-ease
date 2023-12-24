@@ -142,7 +142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/history/entry": {
+        "/history": {
             "get": {
                 "security": [
                     {

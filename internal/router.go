@@ -39,8 +39,7 @@ func (r *router) AuthRoute(handler handler.AuthHandler) {
 
 func (r *router) HistoryRoute(handler handler.HistoryHandler) {
 	history := r.app.Group("history")
-	entry := history.Group("entry")
-	entry.Get("", r.mid.Auth(false), handler.AllHistory)
+	history.Get("", r.mid.Auth(false), handler.AllHistory)
 }
 
 func (r *router) UserRoute(handler handler.UserHandler) {

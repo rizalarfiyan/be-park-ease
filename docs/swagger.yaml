@@ -188,7 +188,7 @@ paths:
       summary: Get Auth Me based on parameter
       tags:
       - auth
-  /history/entry:
+  /history:
     get:
       consumes:
       - application/json
