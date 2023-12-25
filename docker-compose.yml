@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+  postgres-db:
+    image: postgres:12
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/data
+  be-park-ease:
+    image: rizalarfiyan/be-park-ease
+    container_name: be-park-ease
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    expose:
+      - "8080"
+    volumes:
+      - ./docker/be-park-ease/log:/app/log
