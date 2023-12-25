@@ -69,7 +69,7 @@ func (h *settingHandler) CreateOrUpdateSetting(ctx *fiber.Ctx) error {
 	h.exception.IsBadRequestErr(err, "Invalid request body", false)
 
 	err = req.Validate()
-	h.exception.IsErrValidation(err, true)
+	h.exception.IsErrValidation(err, false)
 
 	h.service.CreateOrUpdateSetting(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{

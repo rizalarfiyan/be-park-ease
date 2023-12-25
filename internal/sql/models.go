@@ -131,3 +131,15 @@ type User struct {
 	CreatedAt pgtype.Timestamp
 	UpdatedAt pgtype.Timestamp
 }
+
+type VehicleType struct {
+	Code      string
+	Name      string
+	Price     pgtype.Numeric
+	CreatedAt pgtype.Timestamp
+	CreatedBy int32
+	UpdatedAt pgtype.Timestamp
+	UpdatedBy pgtype.Int4
+	DeletedAt pgtype.Timestamp
+	DeletedBy pgtype.Int4
+}
