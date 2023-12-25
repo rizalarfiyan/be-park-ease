@@ -1,0 +1,23 @@
+name: Push Image to Docker Hub 
+on:
+  push:
+    branches:
+    - master
+  workflow_dispatch:
+
+env:
+  DOCKER_USER: ${{secrets.DOCKER_USER}}
+  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+  REPO_NAME: ${{secrets.REPO_NAME}}
+jobs:
+  push-image-to-docker-hub:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: docker login
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD  
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME
+    - name: Docker Push
+      run: docker push $DOCKER_USER/$REPO_NAME
