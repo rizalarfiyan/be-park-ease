@@ -7,12 +7,18 @@ import (
 	"be-park-ease/internal/repository"
 	"be-park-ease/internal/request"
 	"be-park-ease/internal/response"
+	"be-park-ease/internal/sql"
+	"be-park-ease/utils"
 	"context"
+	"errors"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type VehicleTypeService interface {
 	AllVehicleType(ctx context.Context, req request.BasePagination) response.BaseResponsePagination[response.VehicleType]
 	VehicleTypeById(ctx context.Context, code string) response.VehicleType
+	CreateVehicleType(ctx context.Context, req request.CreateVehicleTypeRequest)
 }
 
 type vehicleTypeService struct {
@@ -62,4 +68,34 @@ func (s *vehicleTypeService) VehicleTypeById(ctx context.Context, code string) r
 	}
 	res.SetPrice(data.Price)
 	return res
+}
+
+func (s *vehicleTypeService) handleErrorUniqueVehicleType(err error, isList bool) {
+	var pgErr *pgconn.PgError
+	ok := errors.As(err, &pgErr)
+	if !ok {
+		return
+	}
+
+	if pgErr.Code != pgerrcode.UniqueViolation {
+		return
+	}
+
+	switch pgErr.ConstraintName {
+	case "vehicle_type_pkey":
+		s.exception.IsBadRequestMessage("Code already exist.", isList)
+	}
+}
+
+func (s *vehicleTypeService) CreateVehicleType(ctx context.Context, req request.CreateVehicleTypeRequest) {
+	payload := sql.CreateVehicleTypeParams{
+		Code:      req.Code,
+		Name:      req.Name,
+		Price:     utils.PGNumericFloat64(req.Price),
+		CreatedBy: req.UserId,
+	}
+
+	err := s.repo.CreateVehicleType(ctx, payload)
+	s.handleErrorUniqueVehicleType(err, false)
+	s.exception.PanicIfError(err, false)
 }

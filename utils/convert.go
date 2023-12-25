@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math/big"
 	"strconv"
 	"strings"
 	"time"
@@ -28,4 +29,15 @@ func PGText(text string) pgtype.Text {
 
 func StrToInt(str string) (int, error) {
 	return strconv.Atoi(str)
+}
+
+func PGNumericFloat64(number float64) pgtype.Numeric {
+	heightFloatVal := big.NewFloat(number)
+	heightBigInt := new(big.Int)
+	heightFloatVal.Int(heightBigInt)
+
+	return pgtype.Numeric{
+		Int:   heightBigInt,
+		Valid: true,
+	}
 }

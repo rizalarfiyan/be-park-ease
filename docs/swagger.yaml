@@ -59,6 +59,18 @@ definitions:
         example: paijo
         type: string
     type: object
+  request.CreateVehicleTypeRequest:
+    properties:
+      code:
+        example: K001
+        type: string
+      name:
+        example: Bicycle
+        type: string
+      price:
+        example: 2000
+        type: number
+    type: object
   request.UpdateUserRequest:
     properties:
       name:
@@ -658,6 +670,34 @@ paths:
       security:
       - AccessToken: []
       summary: Get All Vehicle Type based on parameter
+      tags:
+      - vehicle-type
+    post:
+      consumes:
+      - application/json
+      description: Create Vehicle Type
+      operationId: post-vehicle-type
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateVehicleTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create Vehicle Type based on parameter
       tags:
       - vehicle-type
   /vehicle_type/{code}:

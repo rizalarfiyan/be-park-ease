@@ -744,6 +744,50 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Vehicle Type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vehicle-type"
+                ],
+                "summary": "Post Create Vehicle Type based on parameter",
+                "operationId": "post-vehicle-type",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateVehicleTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
             }
         },
         "/vehicle_type/{code}": {
@@ -892,6 +936,23 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "paijo"
+                }
+            }
+        },
+        "request.CreateVehicleTypeRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "K001"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Bicycle"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 2000
                 }
             }
         },

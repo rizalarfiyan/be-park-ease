@@ -7,6 +7,8 @@ package sql
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countAllVehicleType = `-- name: CountAllVehicleType :one
@@ -18,6 +20,27 @@ func (q *Queries) CountAllVehicleType(ctx context.Context) (int64, error) {
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const createVehicleType = `-- name: CreateVehicleType :exec
+INSERT INTO vehicle_type (code, name, price, created_by) VALUES ($1, $2, $3, $4)
+`
+
+type CreateVehicleTypeParams struct {
+	Code      string
+	Name      string
+	Price     pgtype.Numeric
+	CreatedBy int32
+}
+
+func (q *Queries) CreateVehicleType(ctx context.Context, arg CreateVehicleTypeParams) error {
+	_, err := q.db.Exec(ctx, createVehicleType,
+		arg.Code,
+		arg.Name,
+		arg.Price,
+		arg.CreatedBy,
+	)
+	return err
 }
 
 const getAllVehicleType = `-- name: GetAllVehicleType :many

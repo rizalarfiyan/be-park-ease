@@ -7,6 +7,7 @@ import (
 	"be-park-ease/internal/request"
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
+	"be-park-ease/middleware"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
@@ -14,6 +15,7 @@ import (
 type VehicleTypeHandler interface {
 	AllVehicleType(ctx *fiber.Ctx) error
 	VehicleTypeByCode(ctx *fiber.Ctx) error
+	CreateVehicleType(ctx *fiber.Ctx) error
 }
 
 type vehicleTypeHandler struct {
@@ -93,5 +95,38 @@ func (h *vehicleTypeHandler) VehicleTypeByCode(ctx *fiber.Ctx) error {
 		Code:    http.StatusOK,
 		Message: "Success!",
 		Data:    res,
+	})
+}
+
+// CreateVehicleType godoc
+//
+//	@Summary		Post Create Vehicle Type based on parameter
+//	@Description	Create Vehicle Type
+//	@ID				post-vehicle-type
+//	@Tags			vehicle-type
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CreateVehicleTypeRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/vehicle_type [post]
+func (h *vehicleTypeHandler) CreateVehicleType(ctx *fiber.Ctx) error {
+	req := new(request.CreateVehicleTypeRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, true)
+
+	h.service.CreateVehicleType(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
 	})
 }
