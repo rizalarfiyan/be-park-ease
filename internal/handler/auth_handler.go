@@ -31,7 +31,7 @@ func NewAuthHandler(service service.AuthService) AuthHandler {
 	}
 }
 
-// Auth Login godoc
+// Login godoc
 //
 //	@Summary		Post Auth Login based on parameter
 //	@Description	Auth Login
@@ -46,11 +46,10 @@ func NewAuthHandler(service service.AuthService) AuthHandler {
 func (h *authHandler) Login(ctx *fiber.Ctx) error {
 	req := new(request.AuthLoginRequest)
 	err := ctx.BodyParser(req)
-	if err != nil {
-		return err
-	}
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
 
-	//! FIXME validation with ozzo validation
+	err = req.Validate()
+	h.exception.IsErrValidation(err, true)
 
 	res := h.service.Login(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
@@ -60,7 +59,7 @@ func (h *authHandler) Login(ctx *fiber.Ctx) error {
 	})
 }
 
-// Auth Me godoc
+// Me godoc
 //
 //	@Summary		Get Auth Me based on parameter
 //	@Description	Auth Me

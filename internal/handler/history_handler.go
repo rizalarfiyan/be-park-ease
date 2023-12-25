@@ -49,7 +49,7 @@ func NewHistoryHandler(service service.HistoryService) HistoryHandler {
 //	@Param			location		query		string	false	"Location"
 //	@Success		200				{object}	response.BaseResponse{data=response.BaseResponsePagination[response.EntryHistory]}
 //	@Failure		500				{object}	response.BaseResponse
-//	@Router			/history/entry [get]
+//	@Router			/history [get]
 func (h *historyHandler) AllHistory(ctx *fiber.Ctx) error {
 	req := request.AllHistoryRequest{
 		BasePagination: request.BasePagination{

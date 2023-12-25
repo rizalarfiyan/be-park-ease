@@ -11,6 +11,98 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countAllUser = `-- name: CountAllUser :one
+SELECT COUNT(*) FROM users
+`
+
+func (q *Queries) CountAllUser(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAllUser)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const createUser = `-- name: CreateUser :exec
+insert into users (name, username, password, role, status)
+values ($1, $2, $3, $4, $5)
+`
+
+type CreateUserParams struct {
+	Name     string
+	Username string
+	Password string
+	Role     UserRole
+	Status   UserStatus
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.Exec(ctx, createUser,
+		arg.Name,
+		arg.Username,
+		arg.Password,
+		arg.Role,
+		arg.Status,
+	)
+	return err
+}
+
+const getAllUser = `-- name: GetAllUser :many
+select id, name, username, password, role, status, token, expired_at, created_at, updated_at from users
+`
+
+func (q *Queries) GetAllUser(ctx context.Context) ([]User, error) {
+	rows, err := q.db.Query(ctx, getAllUser)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Username,
+			&i.Password,
+			&i.Role,
+			&i.Status,
+			&i.Token,
+			&i.ExpiredAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserById = `-- name: GetUserById :one
+SELECT id, name, username, password, role, status, token, expired_at, created_at, updated_at FROM users WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Username,
+		&i.Password,
+		&i.Role,
+		&i.Status,
+		&i.Token,
+		&i.ExpiredAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getUserByToken = `-- name: GetUserByToken :one
 SELECT id, name, username, password, role, status, token, expired_at, created_at, updated_at FROM users WHERE token = $1 LIMIT 1
 `
@@ -53,6 +145,49 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updatePassword = `-- name: UpdatePassword :exec
+UPDATE users
+SET password = $1, updated_at = CURRENT_TIMESTAMP
+WHERE id = $2
+`
+
+type UpdatePasswordParams struct {
+	Password string
+	ID       int32
+}
+
+func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) error {
+	_, err := q.db.Exec(ctx, updatePassword, arg.Password, arg.ID)
+	return err
+}
+
+const updateUser = `-- name: UpdateUser :exec
+UPDATE users
+SET name = $1, username = $2, password = $3, role = $4, status = $5, updated_at = CURRENT_TIMESTAMP
+WHERE id = $6
+`
+
+type UpdateUserParams struct {
+	Name     string
+	Username string
+	Password string
+	Role     UserRole
+	Status   UserStatus
+	ID       int32
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.db.Exec(ctx, updateUser,
+		arg.Name,
+		arg.Username,
+		arg.Password,
+		arg.Role,
+		arg.Status,
+		arg.ID,
+	)
+	return err
 }
 
 const updateUserToken = `-- name: UpdateUserToken :exec

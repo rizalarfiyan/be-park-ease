@@ -90,15 +90,18 @@ func main() {
 	// repository
 	authRepository := repository.NewAuthRepository(db)
 	historyRepository := repository.NewHistoryRepository(db)
+	userRepository := repository.NewUserRepository(db)
 
 	// service
 	authService := service.NewAuthService(authRepository)
 	historyService := service.NewHistoryService(historyRepository)
+	userService := service.NewUserService(userRepository)
 
 	// handler
 	baseHandler := handler.NewBaseHandler()
 	authHandler := handler.NewAuthHandler(authService)
 	historyHandler := handler.NewHistoryHandler(historyService)
+	userHandler := handler.NewUserHandler(userService)
 
 	// middleware
 	middleware := middleware.NewMiddleware(authRepository)
@@ -108,6 +111,7 @@ func main() {
 	route.BaseRoute(baseHandler)
 	route.AuthRoute(authHandler)
 	route.HistoryRoute(historyHandler)
+	route.UserRoute(userHandler)
 
 	baseUrl := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	server := &http.Server{

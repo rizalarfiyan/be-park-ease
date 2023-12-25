@@ -12,7 +12,7 @@ func (m *middleware) Auth(isList bool) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		token := ctx.Get("Authorization")
 		if utils.IsEmpty(token) {
-			m.exception.IsUnauthorize(MsgAuthExpired, isList)
+			m.exception.IsUnauthorized(MsgAuthExpired, isList)
 		}
 
 		user, err := m.repo.GetUserByToken(ctx.Context(), token)
@@ -23,7 +23,7 @@ func (m *middleware) Auth(isList bool) fiber.Handler {
 		m.exception.IsUnprocessableEntity(isBanned, MsgAuthDisable, false)
 
 		if user.ExpiredAt.Valid && user.ExpiredAt.Time.Before(time.Now()) {
-			m.exception.IsUnauthorize(MsgAuthExpired, isList)
+			m.exception.IsUnauthorized(MsgAuthExpired, isList)
 		}
 
 		payload := AuthUserData{

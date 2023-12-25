@@ -6,11 +6,14 @@ import (
 	"be-park-ease/utils"
 	"errors"
 	"fmt"
-	"net/http"
-	"runtime"
-
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/jackc/pgx/v5"
 	"github.com/rs/zerolog"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+	"net/http"
+	"runtime"
+	"strings"
 )
 
 type Exception interface {
@@ -20,8 +23,11 @@ type Exception interface {
 	IsNotFoundMessage(value interface{}, message string, isList bool)
 	IsNotFound(value interface{}, isList bool, modules ...string)
 	IsUnprocessableEntity(value interface{}, message string, isList bool)
+	IsBadRequestMessage(message string, isList bool)
 	IsBadRequest(value interface{}, message string, isList bool)
-	IsUnauthorize(message string, isList bool)
+	IsBadRequestErr(err error, message string, isList bool)
+	IsErrValidation(err error, isList bool)
+	IsUnauthorized(message string, isList bool)
 	IsForbidden(message string, isList bool)
 }
 
@@ -102,15 +108,77 @@ func (e *exception) IsUnprocessableEntity(value interface{}, message string, isL
 	})
 }
 
+func (e *exception) IsBadRequestMessage(message string, isList bool) {
+	data := e.DefaultData(isList)
+	panic(response.NewErrorMessage(http.StatusBadRequest, message, data))
+}
+
 func (e *exception) IsBadRequest(value interface{}, message string, isList bool) {
 	e.isEmptyCallback(value, isList, func(isList bool, data interface{}) *response.BaseResponse {
 		return response.NewErrorMessage(http.StatusBadRequest, message, data)
 	})
 }
 
-func (e *exception) IsUnauthorize(message string, isList bool) {
+func (e *exception) IsBadRequestErr(err error, message string, isList bool) {
+	if err != nil {
+		e.IsBadRequest(nil, message, isList)
+	}
+}
+
+func (e *exception) getErrorValidation(err error) (message string) {
+	message = err.Error()
+
+	var errValidation validation.Errors
+	if !errors.As(err, &errValidation) {
+		return
+	}
+
+	arrErrors := strings.Split(errValidation.Error(), "; ")
+	errMsgRaw := message
+	if len(arrErrors) > 0 {
+		errMsgRaw = arrErrors[0]
+	}
+
+	parts := strings.Split(errMsgRaw, ": ")
+	if len(parts) == 2 {
+		field := strings.TrimSpace(parts[0])
+		errorText := strings.TrimSpace(parts[1])
+		errFormatter := "%s %s"
+		if strings.HasPrefix(errorText, "the ") {
+			errFormatter = "The %s %s"
+			errorText = strings.TrimPrefix(errorText, "the ")
+		}
+
+		caseConvert := cases.Title(language.English)
+		fieldName := caseConvert.String(field)
+		if strings.Contains(field, "_") {
+			words := strings.Split(field, "_")
+			for idx, word := range words {
+				words[idx] = caseConvert.String(word)
+			}
+			fieldName = strings.Join(words, " ")
+		}
+		message = fmt.Sprintf(errFormatter, fieldName, errorText)
+	}
+
+	if !strings.HasSuffix(message, ".") {
+		message += "."
+	}
+
+	return
+}
+
+func (e *exception) IsErrValidation(err error, isList bool) {
+	if err != nil {
+		message := e.getErrorValidation(err)
+		data := e.DefaultData(isList)
+		panic(response.NewErrorMessage(http.StatusBadRequest, message, data))
+	}
+}
+
+func (e *exception) IsUnauthorized(message string, isList bool) {
 	data := e.DefaultData(isList)
-	panic(response.NewErrorMessage(http.StatusInternalServerError, message, data))
+	panic(response.NewErrorMessage(http.StatusUnauthorized, message, data))
 }
 
 func (e *exception) IsForbidden(message string, isList bool) {

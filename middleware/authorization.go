@@ -19,7 +19,7 @@ func (m *middleware) baseRoles(roles []sql.UserRole, isList bool) fiber.Handler 
 		user := AuthUserData{}
 		err := user.Get(ctx)
 		if err != nil {
-			m.exception.IsUnauthorize(MsgAuthNotImplement, isList)
+			m.exception.IsUnauthorized(MsgAuthNotImplement, isList)
 		}
 
 		if _, ok := mapRoles[user.Role]; !ok {

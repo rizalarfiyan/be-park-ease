@@ -23,7 +23,7 @@ func NewBaseHandler() BaseHandler {
 	}
 }
 
-// Base Home godoc
+// Home godoc
 //
 //	@Summary		Get Base Home based on parameter
 //	@Description	Base Home

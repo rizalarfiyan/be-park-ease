@@ -20,6 +20,58 @@ definitions:
       username:
         type: string
     type: object
+  request.ChangePasswordRequest:
+    properties:
+      old_password:
+        example: Password123@
+        type: string
+      password:
+        example: Password123@
+        type: string
+      password_confirmation:
+        example: Password123@
+        type: string
+    type: object
+  request.CreateUserRequest:
+    properties:
+      name:
+        example: Paijo Royo Royo
+        type: string
+      password:
+        example: password
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/sql.UserRole'
+        example: karyawan
+      status:
+        allOf:
+        - $ref: '#/definitions/sql.UserStatus'
+        example: active
+      username:
+        example: paijo
+        type: string
+    type: object
+  request.UpdateUserRequest:
+    properties:
+      name:
+        example: Paijo Royo Royo
+        type: string
+      password:
+        example: password
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/sql.UserRole'
+        example: karyawan
+      status:
+        allOf:
+        - $ref: '#/definitions/sql.UserStatus'
+        example: active
+      username:
+        example: paijo
+        type: string
+    type: object
   response.BaseMetadataPagination:
     properties:
       page:
@@ -48,6 +100,15 @@ definitions:
       metadata:
         $ref: '#/definitions/response.BaseMetadataPagination'
     type: object
+  response.BaseResponsePagination-response_User:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/response.User'
+        type: array
+      metadata:
+        $ref: '#/definitions/response.BaseMetadataPagination'
+    type: object
   response.EntryHistory:
     properties:
       date:
@@ -61,6 +122,19 @@ definitions:
       vehicle_number:
         type: string
       vehicle_type_code:
+        type: string
+    type: object
+  response.User:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/sql.UserRole'
+      status:
+        $ref: '#/definitions/sql.UserStatus'
+      username:
         type: string
     type: object
   sql.UserRole:
@@ -166,7 +240,7 @@ paths:
       summary: Get Auth Me based on parameter
       tags:
       - auth
-  /history/entry:
+  /history:
     get:
       consumes:
       - application/json
@@ -242,6 +316,199 @@ paths:
       summary: Get All History based on parameter
       tags:
       - history
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: All User
+      operationId: get-all-user
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Order by
+        enum:
+        - name
+        - username
+        - role
+        - status
+        in: query
+        name: order_by
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      - description: Role
+        enum:
+        - admin
+        - karyawan
+        in: query
+        name: role
+        type: string
+      - description: Status
+        enum:
+        - active
+        - banned
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.BaseResponsePagination-response_User'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get All User based on parameter
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Create User
+      operationId: post-create-user
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create User based on parameter
+      tags:
+      - user
+  /user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: User By ID
+      operationId: get-user-by-id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.User'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get User By ID based on parameter
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update User
+      operationId: put-update-user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        type: integer
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Update User based on parameter
+      tags:
+      - user
+  /user/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Post Change Password
+      operationId: post-change-password-user
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Change Password User based on parameter
+      tags:
+      - user
 securityDefinitions:
   AccessToken:
     in: header
