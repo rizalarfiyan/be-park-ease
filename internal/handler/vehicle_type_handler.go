@@ -124,7 +124,7 @@ func (h *vehicleTypeHandler) CreateVehicleType(ctx *fiber.Ctx) error {
 	req.UserId = user.ID
 
 	err = req.Validate()
-	h.exception.IsErrValidation(err, true)
+	h.exception.IsErrValidation(err, false)
 
 	h.service.CreateVehicleType(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
@@ -159,7 +159,7 @@ func (h *vehicleTypeHandler) UpdateVehicleType(ctx *fiber.Ctx) error {
 	req.Code = ctx.Params("code")
 
 	err = req.Validate()
-	h.exception.IsErrValidation(err, true)
+	h.exception.IsErrValidation(err, false)
 
 	h.service.UpdateVehicleType(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
