@@ -62,4 +62,5 @@ func (r *router) SettingRoute(handler handler.SettingHandler) {
 func (r *router) VehicleTypeRoute(handler handler.VehicleTypeHandler) {
 	vehicleType := r.app.Group("vehicle_type")
 	vehicleType.Get("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.AllVehicleType)
+	vehicleType.Get(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.VehicleTypeByCode)
 }

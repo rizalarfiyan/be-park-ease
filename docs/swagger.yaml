@@ -170,8 +170,6 @@ definitions:
     properties:
       code:
         type: string
-      date:
-        type: string
       name:
         type: string
       price:
@@ -608,8 +606,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: All VehicleType
-      operationId: get-all-vehicleType
+      description: All Vehicle Type
+      operationId: get-all-vehicle-type
       parameters:
       - default: 1
         description: Page
@@ -659,7 +657,39 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       security:
       - AccessToken: []
-      summary: Get All VehicleType based on parameter
+      summary: Get All Vehicle Type based on parameter
+      tags:
+      - vehicle-type
+  /vehicle_type/{code}:
+    get:
+      consumes:
+      - application/json
+      description: Vehicle Type By Code
+      operationId: get-vehicle-type-by-code
+      parameters:
+      - description: Vehicle Type Code
+        in: path
+        name: code
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.VehicleType'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get Vehicle Type By Code based on parameter
       tags:
       - vehicle-type
 securityDefinitions:

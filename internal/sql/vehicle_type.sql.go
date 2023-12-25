@@ -53,3 +53,24 @@ func (q *Queries) GetAllVehicleType(ctx context.Context) ([]VehicleType, error) 
 	}
 	return items, nil
 }
+
+const getVehicleTypeByCode = `-- name: GetVehicleTypeByCode :one
+SELECT code, name, price, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM vehicle_type where code = $1 LIMIT 1
+`
+
+func (q *Queries) GetVehicleTypeByCode(ctx context.Context, code string) (VehicleType, error) {
+	row := q.db.QueryRow(ctx, getVehicleTypeByCode, code)
+	var i VehicleType
+	err := row.Scan(
+		&i.Code,
+		&i.Name,
+		&i.Price,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+		&i.DeletedAt,
+		&i.DeletedBy,
+	)
+	return i, err
+}

@@ -662,7 +662,7 @@ const docTemplate = `{
                         "AccessToken": []
                     }
                 ],
-                "description": "All VehicleType",
+                "description": "All Vehicle Type",
                 "consumes": [
                     "application/json"
                 ],
@@ -672,8 +672,8 @@ const docTemplate = `{
                 "tags": [
                     "vehicle-type"
                 ],
-                "summary": "Get All VehicleType based on parameter",
-                "operationId": "get-all-vehicleType",
+                "summary": "Get All Vehicle Type based on parameter",
+                "operationId": "get-all-vehicle-type",
                 "parameters": [
                     {
                         "type": "integer",
@@ -731,6 +731,61 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/response.BaseResponsePagination-response_VehicleType"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vehicle_type/{code}": {
+            "get": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Vehicle Type By Code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vehicle-type"
+                ],
+                "summary": "Get Vehicle Type By Code based on parameter",
+                "operationId": "get-vehicle-type-by-code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vehicle Type Code",
+                        "name": "code",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.VehicleType"
                                         }
                                     }
                                 }
@@ -1010,9 +1065,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "type": "string"
-                },
-                "date": {
                     "type": "string"
                 },
                 "name": {

@@ -13,6 +13,7 @@ import (
 
 type VehicleTypeHandler interface {
 	AllVehicleType(ctx *fiber.Ctx) error
+	VehicleTypeByCode(ctx *fiber.Ctx) error
 }
 
 type vehicleTypeHandler struct {
@@ -31,9 +32,9 @@ func NewVehicleTypeHandler(service service.VehicleTypeService) VehicleTypeHandle
 
 // AllVehicleType godoc
 //
-//	@Summary		Get All VehicleType based on parameter
-//	@Description	All VehicleType
-//	@ID				get-all-vehicleType
+//	@Summary		Get All Vehicle Type based on parameter
+//	@Description	All Vehicle Type
+//	@ID				get-all-vehicle-type
 //	@Tags			vehicle-type
 //	@Accept			json
 //	@Produce		json
@@ -66,6 +67,28 @@ func (h *vehicleTypeHandler) AllVehicleType(ctx *fiber.Ctx) error {
 	req.Normalize()
 
 	res := h.service.AllVehicleType(ctx.Context(), req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+		Data:    res,
+	})
+}
+
+// VehicleTypeByCode godoc
+//
+//	@Summary		Get Vehicle Type By Code based on parameter
+//	@Description	Vehicle Type By Code
+//	@ID				get-vehicle-type-by-code
+//	@Tags			vehicle-type
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			code	path		string	false	"Vehicle Type Code"
+//	@Success		200		{object}	response.BaseResponse{data=response.VehicleType}
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/vehicle_type/{code} [get]
+func (h *vehicleTypeHandler) VehicleTypeByCode(ctx *fiber.Ctx) error {
+	res := h.service.VehicleTypeById(ctx.Context(), ctx.Params("code"))
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",

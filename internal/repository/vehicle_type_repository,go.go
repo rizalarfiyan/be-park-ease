@@ -12,6 +12,7 @@ import (
 
 type VehicleTypeRepository interface {
 	AllVehicleType(ctx context.Context, req request.BasePagination) (*model.ContentPagination[sql.VehicleType], error)
+	VehicleTypeByCode(ctx context.Context, code string) (sql.VehicleType, error)
 }
 
 type vehicleTypeRepository struct {
@@ -60,4 +61,8 @@ func (r *vehicleTypeRepository) AllVehicleType(ctx context.Context, req request.
 	res.Content = entryHistory
 	res.Count = count
 	return &res, nil
+}
+
+func (r *vehicleTypeRepository) VehicleTypeByCode(ctx context.Context, code string) (sql.VehicleType, error) {
+	return r.query.GetVehicleTypeByCode(ctx, code)
 }

@@ -12,6 +12,7 @@ import (
 
 type VehicleTypeService interface {
 	AllVehicleType(ctx context.Context, req request.BasePagination) response.BaseResponsePagination[response.VehicleType]
+	VehicleTypeById(ctx context.Context, code string) response.VehicleType
 }
 
 type vehicleTypeService struct {
@@ -43,15 +44,22 @@ func (s *vehicleTypeService) AllVehicleType(ctx context.Context, req request.Bas
 			Code: val.Code,
 			Name: val.Name,
 		}
-		price, err := val.Price.Float64Value()
-		if val.Price.Valid && err == nil {
-			res.Price = price.Float64
-		}
-		if val.CreatedAt.Valid {
-			res.Date = val.CreatedAt.Time
-		}
+		res.SetPrice(val.Price)
 		content.Content = append(content.Content, res)
 	}
 
 	return response.WithPagination[response.VehicleType](content, req)
+}
+
+func (s *vehicleTypeService) VehicleTypeById(ctx context.Context, code string) response.VehicleType {
+	data, err := s.repo.VehicleTypeByCode(ctx, code)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	s.exception.IsNotFound(data, false)
+
+	res := response.VehicleType{
+		Code: data.Code,
+		Name: data.Name,
+	}
+	res.SetPrice(data.Price)
+	return res
 }
