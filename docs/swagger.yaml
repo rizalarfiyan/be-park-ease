@@ -32,6 +32,13 @@ definitions:
         example: Password123@
         type: string
     type: object
+  request.CreateOrUpdateSettingRequest:
+    properties:
+      fine_ticket_calculation:
+        type: integer
+      next_hour_calculation:
+        type: integer
+    type: object
   request.CreateUserRequest:
     properties:
       name:
@@ -122,6 +129,17 @@ definitions:
       vehicle_number:
         type: string
       vehicle_type_code:
+        type: string
+    type: object
+  response.SettingResponse:
+    properties:
+      fine_ticket_calculation:
+        type: integer
+      fine_ticket_calculation_description:
+        type: string
+      next_hour_calculation:
+        type: integer
+      next_hour_calculation_description:
         type: string
     type: object
   response.User:
@@ -316,6 +334,61 @@ paths:
       summary: Get All History based on parameter
       tags:
       - history
+  /setting:
+    get:
+      consumes:
+      - application/json
+      description: Get All Setting
+      operationId: get-all-setting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.SettingResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get All Setting based on parameter
+      tags:
+      - setting
+    post:
+      consumes:
+      - application/json
+      description: Create Or Update Setting
+      operationId: post-create-or-update-setting
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateOrUpdateSettingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create Or Update based on parameter
+      tags:
+      - setting
   /user:
     get:
       consumes:

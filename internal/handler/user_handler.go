@@ -10,7 +10,6 @@ import (
 	"be-park-ease/internal/sql"
 	"be-park-ease/middleware"
 	"be-park-ease/utils"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
@@ -199,7 +198,6 @@ func (h *userHandler) ChangePassword(ctx *fiber.Ctx) error {
 	req.UserId = user.ID
 
 	err = req.Validate()
-	fmt.Println(err)
 	h.exception.IsErrValidation(err, false)
 
 	h.service.ChangePassword(ctx.Context(), *req)

@@ -13,6 +13,7 @@ type Router interface {
 	AuthRoute(handler handler.AuthHandler)
 	HistoryRoute(handler handler.HistoryHandler)
 	UserRoute(handler handler.UserHandler)
+	SettingRoute(handler handler.SettingHandler)
 }
 
 type router struct {
@@ -49,4 +50,10 @@ func (r *router) UserRoute(handler handler.UserHandler) {
 	user.Post("change-password", r.mid.Auth(false), handler.ChangePassword)
 	user.Get(":id", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UserById)
 	user.Put(":id", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateUser)
+}
+
+func (r *router) SettingRoute(handler handler.SettingHandler) {
+	setting := r.app.Group("setting")
+	setting.Get("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.GetAllSetting)
+	setting.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateOrUpdateSetting)
 }

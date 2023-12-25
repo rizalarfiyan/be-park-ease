@@ -14,3 +14,8 @@ var (
 	ValidationUsername = validation.Match(regexp.MustCompile(`^[a-zA-Z0-9._][a-zA-Z0-9._]{3,18}[a-zA-Z0-9._]$`)).Error("the invalid format, must be 5-20 characters, only alphanumeric, dot, and underscore")
 	ValidationPassword = validation.Match(regexp.MustCompile(`^[A-Za-z\d@$!%*#?&]*[A-Za-z][A-Za-z\d@$!%*#?&]*\d[A-Za-z\d@$!%*#?&]*[@$!%*#?&][A-Za-z\d@$!%*#?&]*$`)).Error("the invalid format, must be 8 characters, at least 1 letter, 1 number and 1 special character")
 )
+
+var (
+	SettingFineTicketCalculation = "fine_ticket_calculation"
+	SettingNextHourCalculation   = "next_hour_calculation"
+)
