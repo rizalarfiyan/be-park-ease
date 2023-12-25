@@ -3,7 +3,6 @@ package request
 import (
 	"be-park-ease/constants"
 	"be-park-ease/internal/sql"
-	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -66,8 +65,6 @@ type ChangePasswordRequest struct {
 }
 
 func (req ChangePasswordRequest) Validate() error {
-	fmt.Println(req.Password)
-	fmt.Println(req.PasswordConfirmation)
 	return validation.ValidateStruct(&req,
 		validation.Field(&req.OldPassword, validation.Required),
 		validation.Field(&req.Password, validation.Required, constants.ValidationPassword),

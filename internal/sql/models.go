@@ -113,6 +113,12 @@ func (e UserStatus) Valid() bool {
 	return false
 }
 
+type Setting struct {
+	Key         string
+	Value       string
+	Description string
+}
+
 type User struct {
 	ID        int32
 	Name      string

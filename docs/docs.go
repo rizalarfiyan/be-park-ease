@@ -258,6 +258,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/setting": {
+            "get": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Get All Setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "Get All Setting based on parameter",
+                "operationId": "get-all-setting",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.SettingResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "security": [
@@ -755,6 +802,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "vehicle_type_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.SettingResponse": {
+            "type": "object",
+            "properties": {
+                "fine_ticket_calculation": {
+                    "type": "integer"
+                },
+                "fine_ticket_calculation_description": {
+                    "type": "string"
+                },
+                "next_hour_calculation": {
+                    "type": "integer"
+                },
+                "next_hour_calculation_description": {
                     "type": "string"
                 }
             }
