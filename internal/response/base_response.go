@@ -44,6 +44,7 @@ type BaseMetadataPagination struct {
 	Total   int64 `json:"total"`
 	Page    int   `json:"page"`
 	PerPage int   `json:"per_page"`
+	HasNext bool  `json:"has_next"`
 }
 
 type BaseResponsePagination[T any] struct {
@@ -58,6 +59,7 @@ func WithPagination[T any](content model.ContentPagination[T], req request.BaseP
 			Total:   content.Count,
 			Page:    req.Page,
 			PerPage: req.Limit,
+			HasNext: int64(req.Page*req.Limit) < content.Count,
 		},
 	}
 }

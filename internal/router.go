@@ -14,6 +14,7 @@ type Router interface {
 	HistoryRoute(handler handler.HistoryHandler)
 	UserRoute(handler handler.UserHandler)
 	SettingRoute(handler handler.SettingHandler)
+	VehicleTypeRoute(handler handler.VehicleTypeHandler)
 }
 
 type router struct {
@@ -56,4 +57,9 @@ func (r *router) SettingRoute(handler handler.SettingHandler) {
 	setting := r.app.Group("setting")
 	setting.Get("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.GetAllSetting)
 	setting.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateOrUpdateSetting)
+}
+
+func (r *router) VehicleTypeRoute(handler handler.VehicleTypeHandler) {
+	vehicleType := r.app.Group("vehicle_type")
+	vehicleType.Get("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.AllVehicleType)
 }

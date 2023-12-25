@@ -647,6 +647,97 @@
                     }
                 }
             }
+        },
+        "/vehicle_type": {
+            "get": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "All VehicleType",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vehicle-type"
+                ],
+                "summary": "Get All VehicleType based on parameter",
+                "operationId": "get-all-vehicleType",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "code",
+                            "name",
+                            "price",
+                            "date"
+                        ],
+                        "type": "string",
+                        "description": "Order by",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Order",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.BaseResponsePagination-response_VehicleType"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -778,6 +869,9 @@
         "response.BaseMetadataPagination": {
             "type": "object",
             "properties": {
+                "has_next": {
+                    "type": "boolean"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -824,6 +918,20 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.User"
+                    }
+                },
+                "metadata": {
+                    "$ref": "#/definitions/response.BaseMetadataPagination"
+                }
+            }
+        },
+        "response.BaseResponsePagination-response_VehicleType": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.VehicleType"
                     }
                 },
                 "metadata": {
@@ -888,6 +996,23 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "response.VehicleType": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
                 }
             }
         },

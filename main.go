@@ -92,12 +92,14 @@ func main() {
 	historyRepository := repository.NewHistoryRepository(db)
 	userRepository := repository.NewUserRepository(db)
 	settingRepository := repository.NewSettingRepository(db)
+	vehicleTypeRepository := repository.NewVehicleTypeRepository(db)
 
 	// service
 	authService := service.NewAuthService(authRepository)
 	historyService := service.NewHistoryService(historyRepository)
 	userService := service.NewUserService(userRepository)
 	settingService := service.NewSettingService(settingRepository)
+	vehicleTypeService := service.NewVehicleTypeService(vehicleTypeRepository)
 
 	// handler
 	baseHandler := handler.NewBaseHandler()
@@ -105,6 +107,7 @@ func main() {
 	historyHandler := handler.NewHistoryHandler(historyService)
 	userHandler := handler.NewUserHandler(userService)
 	settingHandler := handler.NewSettingHandler(settingService)
+	vehicleTypeHandler := handler.NewVehicleTypeHandler(vehicleTypeService)
 
 	// middleware
 	middleware := middleware.NewMiddleware(authRepository)
@@ -116,6 +119,7 @@ func main() {
 	route.HistoryRoute(historyHandler)
 	route.UserRoute(userHandler)
 	route.SettingRoute(settingHandler)
+	route.VehicleTypeRoute(vehicleTypeHandler)
 
 	baseUrl := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	server := &http.Server{

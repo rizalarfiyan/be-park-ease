@@ -81,6 +81,8 @@ definitions:
     type: object
   response.BaseMetadataPagination:
     properties:
+      has_next:
+        type: boolean
       page:
         type: integer
       per_page:
@@ -112,6 +114,15 @@ definitions:
       content:
         items:
           $ref: '#/definitions/response.User'
+        type: array
+      metadata:
+        $ref: '#/definitions/response.BaseMetadataPagination'
+    type: object
+  response.BaseResponsePagination-response_VehicleType:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/response.VehicleType'
         type: array
       metadata:
         $ref: '#/definitions/response.BaseMetadataPagination'
@@ -154,6 +165,17 @@ definitions:
         $ref: '#/definitions/sql.UserStatus'
       username:
         type: string
+    type: object
+  response.VehicleType:
+    properties:
+      code:
+        type: string
+      date:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
     type: object
   sql.UserRole:
     enum:
@@ -582,6 +604,64 @@ paths:
       summary: Post Change Password User based on parameter
       tags:
       - user
+  /vehicle_type:
+    get:
+      consumes:
+      - application/json
+      description: All VehicleType
+      operationId: get-all-vehicleType
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Order by
+        enum:
+        - code
+        - name
+        - price
+        - date
+        in: query
+        name: order_by
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.BaseResponsePagination-response_VehicleType'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get All VehicleType based on parameter
+      tags:
+      - vehicle-type
 securityDefinitions:
   AccessToken:
     in: header
