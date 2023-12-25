@@ -19,6 +19,7 @@ type VehicleTypeService interface {
 	AllVehicleType(ctx context.Context, req request.BasePagination) response.BaseResponsePagination[response.VehicleType]
 	VehicleTypeById(ctx context.Context, code string) response.VehicleType
 	CreateVehicleType(ctx context.Context, req request.CreateVehicleTypeRequest)
+	UpdateVehicleType(ctx context.Context, req request.UpdateVehicleTypeRequest)
 }
 
 type vehicleTypeService struct {
@@ -96,6 +97,19 @@ func (s *vehicleTypeService) CreateVehicleType(ctx context.Context, req request.
 	}
 
 	err := s.repo.CreateVehicleType(ctx, payload)
+	s.handleErrorUniqueVehicleType(err, false)
+	s.exception.PanicIfError(err, false)
+}
+
+func (s *vehicleTypeService) UpdateVehicleType(ctx context.Context, req request.UpdateVehicleTypeRequest) {
+	payload := sql.UpdateVehicleTypeParams{
+		Code:      req.Code,
+		Name:      req.Name,
+		Price:     utils.PGNumericFloat64(req.Price),
+		UpdatedBy: utils.PGInt32(req.UserId),
+	}
+
+	err := s.repo.UpdateVehicleType(ctx, payload)
 	s.handleErrorUniqueVehicleType(err, false)
 	s.exception.PanicIfError(err, false)
 }

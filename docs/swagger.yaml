@@ -91,6 +91,15 @@ definitions:
         example: paijo
         type: string
     type: object
+  request.UpdateVehicleTypeRequest:
+    properties:
+      name:
+        example: Bicycle
+        type: string
+      price:
+        example: 2000
+        type: number
+    type: object
   response.BaseMetadataPagination:
     properties:
       has_next:
@@ -676,7 +685,7 @@ paths:
       consumes:
       - application/json
       description: Create Vehicle Type
-      operationId: post-vehicle-type
+      operationId: post-create-vehicle-type
       parameters:
       - description: Data
         in: body
@@ -730,6 +739,38 @@ paths:
       security:
       - AccessToken: []
       summary: Get Vehicle Type By Code based on parameter
+      tags:
+      - vehicle-type
+    put:
+      consumes:
+      - application/json
+      description: Update Vehicle Type
+      operationId: put-update-vehicle-type
+      parameters:
+      - description: Vehicle Type Code
+        in: path
+        name: code
+        type: string
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateVehicleTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Put Update Vehicle Type based on parameter
       tags:
       - vehicle-type
 securityDefinitions:

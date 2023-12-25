@@ -97,3 +97,24 @@ func (q *Queries) GetVehicleTypeByCode(ctx context.Context, code string) (Vehicl
 	)
 	return i, err
 }
+
+const updateVehicleType = `-- name: UpdateVehicleType :exec
+UPDATE vehicle_type SET name = $1, price = $2, updated_by = $3, updated_at = CURRENT_TIMESTAMP WHERE code = $4
+`
+
+type UpdateVehicleTypeParams struct {
+	Name      string
+	Price     pgtype.Numeric
+	UpdatedBy pgtype.Int4
+	Code      string
+}
+
+func (q *Queries) UpdateVehicleType(ctx context.Context, arg UpdateVehicleTypeParams) error {
+	_, err := q.db.Exec(ctx, updateVehicleType,
+		arg.Name,
+		arg.Price,
+		arg.UpdatedBy,
+		arg.Code,
+	)
+	return err
+}

@@ -41,3 +41,10 @@ func PGNumericFloat64(number float64) pgtype.Numeric {
 		Valid: true,
 	}
 }
+
+func PGInt32(number int32) pgtype.Int4 {
+	return pgtype.Int4{
+		Int32: number,
+		Valid: true,
+	}
+}

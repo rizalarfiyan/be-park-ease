@@ -14,6 +14,7 @@ type VehicleTypeRepository interface {
 	AllVehicleType(ctx context.Context, req request.BasePagination) (*model.ContentPagination[sql.VehicleType], error)
 	VehicleTypeByCode(ctx context.Context, code string) (sql.VehicleType, error)
 	CreateVehicleType(ctx context.Context, req sql.CreateVehicleTypeParams) error
+	UpdateVehicleType(ctx context.Context, req sql.UpdateVehicleTypeParams) error
 }
 
 type vehicleTypeRepository struct {
@@ -70,4 +71,8 @@ func (r *vehicleTypeRepository) VehicleTypeByCode(ctx context.Context, code stri
 
 func (r *vehicleTypeRepository) CreateVehicleType(ctx context.Context, req sql.CreateVehicleTypeParams) error {
 	return r.query.CreateVehicleType(ctx, req)
+}
+
+func (r *vehicleTypeRepository) UpdateVehicleType(ctx context.Context, req sql.UpdateVehicleTypeParams) error {
+	return r.query.UpdateVehicleType(ctx, req)
 }

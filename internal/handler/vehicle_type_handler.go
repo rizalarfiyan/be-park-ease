@@ -16,6 +16,7 @@ type VehicleTypeHandler interface {
 	AllVehicleType(ctx *fiber.Ctx) error
 	VehicleTypeByCode(ctx *fiber.Ctx) error
 	CreateVehicleType(ctx *fiber.Ctx) error
+	UpdateVehicleType(ctx *fiber.Ctx) error
 }
 
 type vehicleTypeHandler struct {
@@ -102,7 +103,7 @@ func (h *vehicleTypeHandler) VehicleTypeByCode(ctx *fiber.Ctx) error {
 //
 //	@Summary		Post Create Vehicle Type based on parameter
 //	@Description	Create Vehicle Type
-//	@ID				post-vehicle-type
+//	@ID				post-create-vehicle-type
 //	@Tags			vehicle-type
 //	@Accept			json
 //	@Produce		json
@@ -125,6 +126,41 @@ func (h *vehicleTypeHandler) CreateVehicleType(ctx *fiber.Ctx) error {
 	h.exception.IsErrValidation(err, true)
 
 	h.service.CreateVehicleType(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+	})
+}
+
+// UpdateVehicleType godoc
+//
+//	@Summary		Put Update Vehicle Type based on parameter
+//	@Description	Update Vehicle Type
+//	@ID				put-update-vehicle-type
+//	@Tags			vehicle-type
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			code	path		string								false	"Vehicle Type Code"
+//	@Param			data	body		request.UpdateVehicleTypeRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/vehicle_type/{code} [put]
+func (h *vehicleTypeHandler) UpdateVehicleType(ctx *fiber.Ctx) error {
+	req := new(request.UpdateVehicleTypeRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+	req.Code = ctx.Params("code")
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, true)
+
+	h.service.UpdateVehicleType(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
