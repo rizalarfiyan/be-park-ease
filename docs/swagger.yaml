@@ -710,6 +710,32 @@ paths:
       tags:
       - vehicle-type
   /vehicle_type/{code}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Vehicle Type
+      operationId: delete-vehicle-type
+      parameters:
+      - description: Vehicle Type Code
+        in: path
+        name: code
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Put Delete Vehicle Type based on parameter
+      tags:
+      - vehicle-type
     get:
       consumes:
       - application/json

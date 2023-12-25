@@ -15,6 +15,7 @@ type VehicleTypeRepository interface {
 	VehicleTypeByCode(ctx context.Context, code string) (sql.VehicleType, error)
 	CreateVehicleType(ctx context.Context, req sql.CreateVehicleTypeParams) error
 	UpdateVehicleType(ctx context.Context, req sql.UpdateVehicleTypeParams) error
+	DeleteVehicleType(ctx context.Context, req sql.DeleteVehicleTypeParams) error
 }
 
 type vehicleTypeRepository struct {
@@ -75,4 +76,8 @@ func (r *vehicleTypeRepository) CreateVehicleType(ctx context.Context, req sql.C
 
 func (r *vehicleTypeRepository) UpdateVehicleType(ctx context.Context, req sql.UpdateVehicleTypeParams) error {
 	return r.query.UpdateVehicleType(ctx, req)
+}
+
+func (r *vehicleTypeRepository) DeleteVehicleType(ctx context.Context, req sql.DeleteVehicleTypeParams) error {
+	return r.query.DeleteVehicleType(ctx, req)
 }

@@ -65,4 +65,5 @@ func (r *router) VehicleTypeRoute(handler handler.VehicleTypeHandler) {
 	vehicleType.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateVehicleType)
 	vehicleType.Get(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.VehicleTypeByCode)
 	vehicleType.Put(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateVehicleType)
+	vehicleType.Delete(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.DeleteVehicleType)
 }

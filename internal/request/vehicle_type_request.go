@@ -33,3 +33,8 @@ func (req UpdateVehicleTypeRequest) Validate() error {
 		validation.Field(&req.Price, validation.Required, validation.Min(0.0), validation.Max(99999999999999999999.99)),
 	)
 }
+
+type DeleteVehicleTypeRequest struct {
+	Code   string
+	UserId int32
+}

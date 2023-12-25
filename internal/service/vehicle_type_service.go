@@ -20,6 +20,7 @@ type VehicleTypeService interface {
 	VehicleTypeById(ctx context.Context, code string) response.VehicleType
 	CreateVehicleType(ctx context.Context, req request.CreateVehicleTypeRequest)
 	UpdateVehicleType(ctx context.Context, req request.UpdateVehicleTypeRequest)
+	DeleteVehicleType(ctx context.Context, req request.DeleteVehicleTypeRequest)
 }
 
 type vehicleTypeService struct {
@@ -110,6 +111,17 @@ func (s *vehicleTypeService) UpdateVehicleType(ctx context.Context, req request.
 	}
 
 	err := s.repo.UpdateVehicleType(ctx, payload)
+	s.handleErrorUniqueVehicleType(err, false)
+	s.exception.PanicIfError(err, false)
+}
+
+func (s *vehicleTypeService) DeleteVehicleType(ctx context.Context, req request.DeleteVehicleTypeRequest) {
+	payload := sql.DeleteVehicleTypeParams{
+		Code:      req.Code,
+		DeletedBy: utils.PGInt32(req.UserId),
+	}
+
+	err := s.repo.DeleteVehicleType(ctx, payload)
 	s.handleErrorUniqueVehicleType(err, false)
 	s.exception.PanicIfError(err, false)
 }

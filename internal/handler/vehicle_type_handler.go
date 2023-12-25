@@ -17,6 +17,7 @@ type VehicleTypeHandler interface {
 	VehicleTypeByCode(ctx *fiber.Ctx) error
 	CreateVehicleType(ctx *fiber.Ctx) error
 	UpdateVehicleType(ctx *fiber.Ctx) error
+	DeleteVehicleType(ctx *fiber.Ctx) error
 }
 
 type vehicleTypeHandler struct {
@@ -161,6 +162,34 @@ func (h *vehicleTypeHandler) UpdateVehicleType(ctx *fiber.Ctx) error {
 	h.exception.IsErrValidation(err, true)
 
 	h.service.UpdateVehicleType(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+	})
+}
+
+// DeleteVehicleType godoc
+//
+//	@Summary		Put Delete Vehicle Type based on parameter
+//	@Description	Delete Vehicle Type
+//	@ID				delete-vehicle-type
+//	@Tags			vehicle-type
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			code	path		string	false	"Vehicle Type Code"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/vehicle_type/{code} [delete]
+func (h *vehicleTypeHandler) DeleteVehicleType(ctx *fiber.Ctx) error {
+	req := request.DeleteVehicleTypeRequest{}
+	user := middleware.AuthUserData{}
+	err := user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+	req.Code = ctx.Params("code")
+
+	h.service.DeleteVehicleType(ctx.Context(), req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",

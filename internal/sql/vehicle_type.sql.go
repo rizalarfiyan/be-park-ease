@@ -43,6 +43,20 @@ func (q *Queries) CreateVehicleType(ctx context.Context, arg CreateVehicleTypePa
 	return err
 }
 
+const deleteVehicleType = `-- name: DeleteVehicleType :exec
+UPDATE vehicle_type SET deleted_by = $1, deleted_at = CURRENT_TIMESTAMP WHERE code = $2
+`
+
+type DeleteVehicleTypeParams struct {
+	DeletedBy pgtype.Int4
+	Code      string
+}
+
+func (q *Queries) DeleteVehicleType(ctx context.Context, arg DeleteVehicleTypeParams) error {
+	_, err := q.db.Exec(ctx, deleteVehicleType, arg.DeletedBy, arg.Code)
+	return err
+}
+
 const getAllVehicleType = `-- name: GetAllVehicleType :many
 SELECT code, name, price, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM vehicle_type
 `
