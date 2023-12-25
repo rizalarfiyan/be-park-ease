@@ -303,6 +303,50 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Or Update Setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "Post Create Or Update based on parameter",
+                "operationId": "post-create-or-update-setting",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateOrUpdateSettingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
             }
         },
         "/user": {
@@ -658,6 +702,17 @@ const docTemplate = `{
                 "password_confirmation": {
                     "type": "string",
                     "example": "Password123@"
+                }
+            }
+        },
+        "request.CreateOrUpdateSettingRequest": {
+            "type": "object",
+            "properties": {
+                "fine_ticket_calculation": {
+                    "type": "integer"
+                },
+                "next_hour_calculation": {
+                    "type": "integer"
                 }
             }
         },
