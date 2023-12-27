@@ -130,6 +130,15 @@ definitions:
       metadata:
         $ref: '#/definitions/response.BaseMetadataPagination'
     type: object
+  response.BaseResponsePagination-response_Location:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/response.Location'
+        type: array
+      metadata:
+        $ref: '#/definitions/response.BaseMetadataPagination'
+    type: object
   response.BaseResponsePagination-response_User:
     properties:
       content:
@@ -161,6 +170,15 @@ definitions:
       vehicle_number:
         type: string
       vehicle_type_code:
+        type: string
+    type: object
+  response.Location:
+    properties:
+      code:
+        type: string
+      is_exit:
+        type: boolean
+      name:
         type: string
     type: object
   response.SettingResponse:
@@ -375,6 +393,129 @@ paths:
       summary: Get All History based on parameter
       tags:
       - history
+  /location:
+    get:
+      consumes:
+      - application/json
+      description: All Location
+      operationId: get-all-location
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Order by
+        enum:
+        - code
+        - name
+        - is_exit
+        - date
+        in: query
+        name: order_by
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.BaseResponsePagination-response_Location'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get All Location based on parameter
+      tags:
+      - location
+  /location/{code}:
+    get:
+      consumes:
+      - application/json
+      description: Location
+      operationId: get-location-by-code
+      parameters:
+      - description: Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get Location based on code
+      tags:
+      - location
+    put:
+      consumes:
+      - application/json
+      description: Location
+      operationId: update-location
+      parameters:
+      - description: Code
+        in: path
+        name: code
+        required: true
+        type: string
+      - description: Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Is Exit
+        in: formData
+        name: is_exit
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Update Location
+      tags:
+      - location
   /setting:
     get:
       consumes:

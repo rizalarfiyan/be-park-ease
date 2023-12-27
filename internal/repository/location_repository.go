@@ -48,7 +48,7 @@ func (l locationRepository) AllLocation(ctx context.Context, req request.BasePag
 		if req.OrderBy != "" && req.Order != "" {
 			b.Ordering(req.OrderBy, req.Order)
 		} else {
-			b.Order("date DESC")
+			b.Order("created_at DESC")
 		}
 		b.Pagination(req.Page, req.Limit)
 	}))

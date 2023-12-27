@@ -87,9 +87,9 @@ func (l *locationHandler) AllLocation(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Security		AccessToken
-//	@Param			code		path		string	true	"Code"
-//	@Success		200			{object}	response.BaseResponse
-//	@Failure		500			{object}	response.BaseResponse
+//	@Param			code	path		string	true	"Code"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
 //	@Router			/location/{code} [get]
 func (l *locationHandler) LocationByCode(ctx *fiber.Ctx) error {
 	res := l.service.LocationByCode(ctx.Context(), ctx.Params("code"))
@@ -109,12 +109,11 @@ func (l *locationHandler) LocationByCode(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Security		AccessToken
-//	@Param			code		path		    string	true	"Code"
-//	@Param			name		formData		string	true	"Name"
-//	@Param			is_exit		formData		bool	true	"Is Exit"
-//	@Success		200			{object}	response.BaseResponse
-//	@Failure		500			{object}	response.BaseResponse
+//	@param			body	CreateLocationRequest	true	"Data"
+//	@Success		200		{object}				response.BaseResponse
+//	@Failure		500		{object}				response.BaseResponse
 //	@Router			/location [post]
+
 func (l *locationHandler) CreateLocation(ctx *fiber.Ctx) error {
 	req := new(request.CreateLocationRequest)
 	err := ctx.BodyParser(req)
@@ -138,19 +137,19 @@ func (l *locationHandler) CreateLocation(ctx *fiber.Ctx) error {
 
 // UpdateLocation godoc
 //
-//		@Summary		Update Location
-//		@Description	Location
-//		@ID				update-location
-//		@Tags			location
-//		@Accept			json
-//		@Produce		json
-//		@Security		AccessToken
-//	 @Param			code		path		   string	true	"Code"
-//		@Param			name		formData		string	true	"Name"
-//		@Param			is_exit		formData		bool	true	"Is Exit"
-//		@Success		200			{object}	response.BaseResponse
-//		@Failure		500			{object}	response.BaseResponse
-//		@Router			/location [put]
+//	@Summary		Update Location
+//	@Description	Location
+//	@ID				update-location
+//	@Tags			location
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			code	path		string	true	"Code"
+//	@Param			name	formData	string	true	"Name"
+//	@Param			is_exit	formData	bool	true	"Is Exit"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/location/{code} [put]
 func (l *locationHandler) UpdateLocation(ctx *fiber.Ctx) error {
 	req := new(request.UpdateLocationRequest)
 	err := ctx.BodyParser(req)
@@ -181,9 +180,9 @@ func (l *locationHandler) UpdateLocation(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Security		AccessToken
-//	@Param			code		path		string	true	"Code"
-//	@Success		200			{object}	response.BaseResponse
-//	@Failure		500			{object}	response.BaseResponse
+//	@Param			code	path		string	true	"Code"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
 //	@Router			/location/{code} [delete]
 
 func (l *locationHandler) DeleteLocation(ctx *fiber.Ctx) error {
