@@ -15,6 +15,7 @@ type Router interface {
 	UserRoute(handler handler.UserHandler)
 	SettingRoute(handler handler.SettingHandler)
 	VehicleTypeRoute(handler handler.VehicleTypeHandler)
+	LocationRoute(handler handler.LocationHandler)
 }
 
 type router struct {
@@ -66,4 +67,13 @@ func (r *router) VehicleTypeRoute(handler handler.VehicleTypeHandler) {
 	vehicleType.Get(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.VehicleTypeByCode)
 	vehicleType.Put(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateVehicleType)
 	vehicleType.Delete(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.DeleteVehicleType)
+}
+
+func (r *router) LocationRoute(handler handler.LocationHandler) {
+	location := r.app.Group("location")
+	location.Get("", r.mid.Auth(true), r.mid.Role(sql.UserRoleAdmin, true), handler.AllLocation)
+	location.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateLocation)
+	location.Get(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.LocationByCode)
+	location.Put(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateLocation)
+	location.Delete(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.DeleteLocation)
 }
