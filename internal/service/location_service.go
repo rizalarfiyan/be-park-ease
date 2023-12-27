@@ -75,6 +75,7 @@ func (l *locationService) LocationByCode(ctx context.Context, code string) respo
 
 func (l *locationService) CreateLocation(ctx context.Context, req request.CreateLocationRequest) {
 	payload := sql.CreateLocationParams{
+		Code:      req.Code,
 		Name:      req.Name,
 		IsExit:    req.IsExit,
 		CreatedBy: req.UserId,

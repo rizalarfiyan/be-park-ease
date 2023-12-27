@@ -23,17 +23,23 @@ func (q *Queries) CountAllLocation(ctx context.Context) (int64, error) {
 }
 
 const createLocation = `-- name: CreateLocation :exec
-Insert into location (name, is_exit , created_by) values ($1, $2, $3)
+Insert into location (code, name, is_exit , created_by) values ($1, $2, $3, $4)
 `
 
 type CreateLocationParams struct {
+	Code      string
 	Name      string
 	IsExit    bool
 	CreatedBy int32
 }
 
 func (q *Queries) CreateLocation(ctx context.Context, arg CreateLocationParams) error {
-	_, err := q.db.Exec(ctx, createLocation, arg.Name, arg.IsExit, arg.CreatedBy)
+	_, err := q.db.Exec(ctx, createLocation,
+		arg.Code,
+		arg.Name,
+		arg.IsExit,
+		arg.CreatedBy,
+	)
 	return err
 }
 
@@ -107,22 +113,24 @@ func (q *Queries) GetLocationByCode(ctx context.Context, code string) (Location,
 }
 
 const updateLocation = `-- name: UpdateLocation :exec
-UPDATE location SET name = $1, is_exit = $2, updated_by = $3, updated_at = CURRENT_TIMESTAMP WHERE code = $4
+UPDATE location SET code = $1, name = $2, is_exit = $3, updated_by = $4, updated_at = CURRENT_TIMESTAMP WHERE code = $5
 `
 
 type UpdateLocationParams struct {
+	Code      string
 	Name      string
 	IsExit    bool
 	UpdatedBy pgtype.Int4
-	Code      string
+	Code_2    string
 }
 
 func (q *Queries) UpdateLocation(ctx context.Context, arg UpdateLocationParams) error {
 	_, err := q.db.Exec(ctx, updateLocation,
+		arg.Code,
 		arg.Name,
 		arg.IsExit,
 		arg.UpdatedBy,
-		arg.Code,
+		arg.Code_2,
 	)
 	return err
 }
