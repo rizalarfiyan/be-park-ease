@@ -32,6 +32,18 @@ definitions:
         example: Password123@
         type: string
     type: object
+  request.CreateLocationRequest:
+    properties:
+      code:
+        example: D1
+        type: string
+      is_exit:
+        example: false
+        type: boolean
+      name:
+        example: DOM 1
+        type: string
+    type: object
   request.CreateOrUpdateSettingRequest:
     properties:
       fine_ticket_calculation:
@@ -70,6 +82,15 @@ definitions:
       price:
         example: 2000
         type: number
+    type: object
+  request.UpdateLocationRequest:
+    properties:
+      is_exit:
+        example: false
+        type: boolean
+      name:
+        example: DOM 1
+        type: string
     type: object
   request.UpdateUserRequest:
     properties:
@@ -451,12 +472,40 @@ paths:
       summary: Get All Location based on parameter
       tags:
       - location
-  /location/{code}:
-    get:
+    post:
       consumes:
       - application/json
       description: Location
-      operationId: get-location-by-code
+      operationId: create-location
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateLocationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Create Location
+      tags:
+      - location
+  /location/{code}:
+    delete:
+      consumes:
+      - application/json
+      description: Location
+      operationId: delete-location
       parameters:
       - description: Code
         in: path
@@ -476,6 +525,38 @@ paths:
             $ref: '#/definitions/response.BaseResponse'
       security:
       - AccessToken: []
+      summary: Delete Location
+      tags:
+      - location
+    get:
+      consumes:
+      - application/json
+      description: Location
+      operationId: get-location-by-code
+      parameters:
+      - description: Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Location'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
       summary: Get Location based on code
       tags:
       - location
@@ -485,21 +566,16 @@ paths:
       description: Location
       operationId: update-location
       parameters:
-      - description: Code
+      - description: Location Code
         in: path
         name: code
-        required: true
         type: string
-      - description: Name
-        in: formData
-        name: name
+      - description: Data
+        in: body
+        name: data
         required: true
-        type: string
-      - description: Is Exit
-        in: formData
-        name: is_exit
-        required: true
-        type: boolean
+        schema:
+          $ref: '#/definitions/request.UpdateLocationRequest'
       produces:
       - application/json
       responses:

@@ -7,6 +7,7 @@ import (
 	"be-park-ease/utils"
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -28,11 +29,11 @@ func NewLocationRepository(db *pgxpool.Pool) LocationRepository {
 	return &locationRepository{
 		db:           db,
 		query:        sql.New(db),
-		queryBuilder: sql.New(db),
+		queryBuilder: sql.New(utils.QueryWrap(db)),
 	}
 }
 
-func (l locationRepository) AllLocation(ctx context.Context, req request.BasePagination) (*model.ContentPagination[sql.Location], error) {
+func (r locationRepository) AllLocation(ctx context.Context, req request.BasePagination) (*model.ContentPagination[sql.Location], error) {
 	var res model.ContentPagination[sql.Location]
 
 	baseBuilder := func(b *utils.QueryBuilder) {
@@ -43,7 +44,7 @@ func (l locationRepository) AllLocation(ctx context.Context, req request.BasePag
 		}
 	}
 
-	entryHistory, err := l.queryBuilder.GetAllLocation(utils.QueryBuild(ctx, func(b *utils.QueryBuilder) {
+	entryHistory, err := r.queryBuilder.GetAllLocation(utils.QueryBuild(ctx, func(b *utils.QueryBuilder) {
 		baseBuilder(b)
 		if req.OrderBy != "" && req.Order != "" {
 			b.Ordering(req.OrderBy, req.Order)
@@ -56,7 +57,7 @@ func (l locationRepository) AllLocation(ctx context.Context, req request.BasePag
 		return nil, err
 	}
 
-	count, err := l.queryBuilder.CountAllLocation(utils.QueryBuild(ctx, baseBuilder))
+	count, err := r.queryBuilder.CountAllLocation(utils.QueryBuild(ctx, baseBuilder))
 	if err != nil {
 		return nil, err
 	}
@@ -66,18 +67,18 @@ func (l locationRepository) AllLocation(ctx context.Context, req request.BasePag
 	return &res, nil
 }
 
-func (l locationRepository) LocationByCode(ctx context.Context, code string) (sql.Location, error) {
-	return l.query.GetLocationByCode(ctx, code)
+func (r locationRepository) LocationByCode(ctx context.Context, code string) (sql.Location, error) {
+	return r.query.GetLocationByCode(ctx, code)
 }
 
-func (l locationRepository) CreateLocation(ctx context.Context, req sql.CreateLocationParams) error {
-	return l.query.CreateLocation(ctx, req)
+func (r locationRepository) CreateLocation(ctx context.Context, req sql.CreateLocationParams) error {
+	return r.query.CreateLocation(ctx, req)
 }
 
-func (l locationRepository) UpdateLocation(ctx context.Context, req sql.UpdateLocationParams) error {
-	return l.query.UpdateLocation(ctx, req)
+func (r locationRepository) UpdateLocation(ctx context.Context, req sql.UpdateLocationParams) error {
+	return r.query.UpdateLocation(ctx, req)
 }
 
-func (l locationRepository) DeleteLocation(ctx context.Context, req sql.DeleteLocationParams) error {
-	return l.query.DeleteLocation(ctx, req)
+func (r locationRepository) DeleteLocation(ctx context.Context, req sql.DeleteLocationParams) error {
+	return r.query.DeleteLocation(ctx, req)
 }

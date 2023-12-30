@@ -113,24 +113,22 @@ func (q *Queries) GetLocationByCode(ctx context.Context, code string) (Location,
 }
 
 const updateLocation = `-- name: UpdateLocation :exec
-UPDATE location SET code = $1, name = $2, is_exit = $3, updated_by = $4, updated_at = CURRENT_TIMESTAMP WHERE code = $5
+UPDATE location SET name = $1, is_exit = $2, updated_by = $3, updated_at = CURRENT_TIMESTAMP WHERE code = $4
 `
 
 type UpdateLocationParams struct {
-	Code      string
 	Name      string
 	IsExit    bool
 	UpdatedBy pgtype.Int4
-	Code_2    string
+	Code      string
 }
 
 func (q *Queries) UpdateLocation(ctx context.Context, arg UpdateLocationParams) error {
 	_, err := q.db.Exec(ctx, updateLocation,
-		arg.Code,
 		arg.Name,
 		arg.IsExit,
 		arg.UpdatedBy,
-		arg.Code_2,
+		arg.Code,
 	)
 	return err
 }
