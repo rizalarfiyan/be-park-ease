@@ -545,7 +545,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.BaseResponse'
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Location'
+              type: object
         "500":
           description: Internal Server Error
           schema:

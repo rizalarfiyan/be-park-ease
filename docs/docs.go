@@ -425,7 +425,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.BaseResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.Location"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {

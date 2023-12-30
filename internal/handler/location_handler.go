@@ -89,7 +89,7 @@ func (h *locationHandler) AllLocation(ctx *fiber.Ctx) error {
 //	@Produce		json
 //	@Security		AccessToken
 //	@Param			code	path		string	true	"Code"
-//	@Success		200		{object}	response.BaseResponse
+//	@Success		200		{object}	response.BaseResponse{data=response.Location}
 //	@Failure		500		{object}	response.BaseResponse
 //	@Router			/location/{code} [get]
 func (h *locationHandler) LocationByCode(ctx *fiber.Ctx) error {
