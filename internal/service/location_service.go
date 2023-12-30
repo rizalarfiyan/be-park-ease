@@ -11,6 +11,7 @@ import (
 	"be-park-ease/utils"
 	"context"
 	"errors"
+
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -37,10 +38,10 @@ func NewLocationService(repo repository.LocationRepository) LocationService {
 	}
 }
 
-func (l *locationService) AllLocation(ctx context.Context, req request.BasePagination) response.BaseResponsePagination[response.Location] {
-	data, err := l.repo.AllLocation(ctx, req)
-	l.exception.PanicIfError(err, true)
-	l.exception.IsNotFound(data, true)
+func (s *locationService) AllLocation(ctx context.Context, req request.BasePagination) response.BaseResponsePagination[response.Location] {
+	data, err := s.repo.AllLocation(ctx, req)
+	s.exception.PanicIfError(err, true)
+	s.exception.IsNotFound(data, true)
 
 	content := model.ContentPagination[response.Location]{
 		Count:   data.Count,
@@ -59,10 +60,10 @@ func (l *locationService) AllLocation(ctx context.Context, req request.BasePagin
 	return response.WithPagination[response.Location](content, req)
 }
 
-func (l *locationService) LocationByCode(ctx context.Context, code string) response.Location {
-	data, err := l.repo.LocationByCode(ctx, code)
-	l.exception.PanicIfErrorWithoutNoSqlResult(err, false)
-	l.exception.IsNotFound(data, false)
+func (s *locationService) LocationByCode(ctx context.Context, code string) response.Location {
+	data, err := s.repo.LocationByCode(ctx, code)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	s.exception.IsNotFound(data, false)
 
 	res := response.Location{
 		Code:   data.Code,
@@ -73,7 +74,7 @@ func (l *locationService) LocationByCode(ctx context.Context, code string) respo
 	return res
 }
 
-func (l *locationService) CreateLocation(ctx context.Context, req request.CreateLocationRequest) {
+func (s *locationService) CreateLocation(ctx context.Context, req request.CreateLocationRequest) {
 	payload := sql.CreateLocationParams{
 		Code:      req.Code,
 		Name:      req.Name,
@@ -81,12 +82,12 @@ func (l *locationService) CreateLocation(ctx context.Context, req request.Create
 		CreatedBy: req.UserId,
 	}
 
-	err := l.repo.CreateLocation(ctx, payload)
-	l.exception.PanicIfError(err, false)
-	l.handleErrorUniqueLocation(err, false)
+	err := s.repo.CreateLocation(ctx, payload)
+	s.handleErrorUniqueLocation(err, false)
+	s.exception.PanicIfError(err, false)
 }
 
-func (l *locationService) UpdateLocation(ctx context.Context, req request.UpdateLocationRequest) {
+func (s *locationService) UpdateLocation(ctx context.Context, req request.UpdateLocationRequest) {
 	payload := sql.UpdateLocationParams{
 		Code:      req.Code,
 		Name:      req.Name,
@@ -94,23 +95,23 @@ func (l *locationService) UpdateLocation(ctx context.Context, req request.Update
 		UpdatedBy: utils.PGInt32(req.UserId),
 	}
 
-	err := l.repo.UpdateLocation(ctx, payload)
-	l.handleErrorUniqueLocation(err, false)
-	l.exception.PanicIfError(err, false)
+	err := s.repo.UpdateLocation(ctx, payload)
+	s.handleErrorUniqueLocation(err, false)
+	s.exception.PanicIfError(err, false)
 }
 
-func (l *locationService) DeleteLocation(ctx context.Context, req request.DeleteLocationRequest) {
+func (s *locationService) DeleteLocation(ctx context.Context, req request.DeleteLocationRequest) {
 	payload := sql.DeleteLocationParams{
 		Code:      req.Code,
 		DeletedBy: utils.PGInt32(req.UserId),
 	}
 
-	err := l.repo.DeleteLocation(ctx, payload)
-	l.exception.PanicIfError(err, false)
-	l.handleErrorUniqueLocation(err, false)
+	err := s.repo.DeleteLocation(ctx, payload)
+	s.handleErrorUniqueLocation(err, false)
+	s.exception.PanicIfError(err, false)
 }
 
-func (l *locationService) handleErrorUniqueLocation(err error, isList bool) {
+func (s *locationService) handleErrorUniqueLocation(err error, isList bool) {
 	var pgErr *pgconn.PgError
 	ok := errors.As(err, &pgErr)
 	if !ok {
@@ -123,6 +124,6 @@ func (l *locationService) handleErrorUniqueLocation(err error, isList bool) {
 
 	switch pgErr.ConstraintName {
 	case "location_pkey":
-		l.exception.IsBadRequestMessage("Location already exist.", isList)
+		s.exception.IsBadRequestMessage("Location already exist.", isList)
 	}
 }

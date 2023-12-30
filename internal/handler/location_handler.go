@@ -8,8 +8,9 @@ import (
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
 	"be-park-ease/middleware"
-	"github.com/gofiber/fiber/v2"
 	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type LocationHandler interface {
@@ -51,7 +52,7 @@ func NewLocationHandler(service service.LocationService) LocationHandler {
 //	@Success		200			{object}	response.BaseResponse{data=response.BaseResponsePagination[response.Location]}
 //	@Failure		500			{object}	response.BaseResponse
 //	@Router			/location [get]
-func (l *locationHandler) AllLocation(ctx *fiber.Ctx) error {
+func (h *locationHandler) AllLocation(ctx *fiber.Ctx) error {
 	req := request.BasePagination{
 		Page:    ctx.QueryInt("page", 1),
 		Limit:   ctx.QueryInt("limit", constants.DefaultPageLimit),
@@ -70,7 +71,7 @@ func (l *locationHandler) AllLocation(ctx *fiber.Ctx) error {
 	req.ValidateAndUpdateOrderBy(fieldOrder)
 	req.Normalize()
 
-	res := l.service.AllLocation(ctx.Context(), req)
+	res := h.service.AllLocation(ctx.Context(), req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
@@ -91,8 +92,8 @@ func (l *locationHandler) AllLocation(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.BaseResponse
 //	@Failure		500		{object}	response.BaseResponse
 //	@Router			/location/{code} [get]
-func (l *locationHandler) LocationByCode(ctx *fiber.Ctx) error {
-	res := l.service.LocationByCode(ctx.Context(), ctx.Params("code"))
+func (h *locationHandler) LocationByCode(ctx *fiber.Ctx) error {
+	res := h.service.LocationByCode(ctx.Context(), ctx.Params("code"))
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
@@ -109,26 +110,24 @@ func (l *locationHandler) LocationByCode(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Security		AccessToken
-//	@param			body	CreateLocationRequest	true	"Data"
-//	@Success		200		{object}				response.BaseResponse
-//	@Failure		500		{object}				response.BaseResponse
+//	@param			data	body		request.CreateLocationRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
 //	@Router			/location [post]
-
-func (l *locationHandler) CreateLocation(ctx *fiber.Ctx) error {
+func (h *locationHandler) CreateLocation(ctx *fiber.Ctx) error {
 	req := new(request.CreateLocationRequest)
 	err := ctx.BodyParser(req)
-	l.exception.IsBadRequestErr(err, "Invalid request body", false)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
 
 	user := middleware.AuthUserData{}
 	err = user.Get(ctx)
-	l.exception.PanicIfError(err, false)
+	h.exception.PanicIfError(err, false)
 	req.UserId = user.ID
-	req.Code = ctx.Params("code")
 
 	err = req.Validate()
-	l.exception.IsErrValidation(err, false)
+	h.exception.IsErrValidation(err, false)
 
-	l.service.CreateLocation(ctx.Context(), *req)
+	h.service.CreateLocation(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
@@ -144,27 +143,26 @@ func (l *locationHandler) CreateLocation(ctx *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Security		AccessToken
-//	@Param			code	path		string	true	"Code"
-//	@Param			name	formData	string	true	"Name"
-//	@Param			is_exit	formData	bool	true	"Is Exit"
+//	@Param			code	path		string							false	"Location Code"
+//	@param			data	body		request.UpdateLocationRequest	true	"Data"
 //	@Success		200		{object}	response.BaseResponse
 //	@Failure		500		{object}	response.BaseResponse
 //	@Router			/location/{code} [put]
-func (l *locationHandler) UpdateLocation(ctx *fiber.Ctx) error {
+func (h *locationHandler) UpdateLocation(ctx *fiber.Ctx) error {
 	req := new(request.UpdateLocationRequest)
 	err := ctx.BodyParser(req)
-	l.exception.IsBadRequestErr(err, "Invalid request body", false)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
 
 	user := middleware.AuthUserData{}
 	err = user.Get(ctx)
-	l.exception.PanicIfError(err, false)
+	h.exception.PanicIfError(err, false)
 	req.UserId = user.ID
 	req.Code = ctx.Params("code")
 
 	err = req.Validate()
-	l.exception.IsErrValidation(err, false)
+	h.exception.IsErrValidation(err, false)
 
-	l.service.UpdateLocation(ctx.Context(), *req)
+	h.service.UpdateLocation(ctx.Context(), *req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
@@ -184,16 +182,15 @@ func (l *locationHandler) UpdateLocation(ctx *fiber.Ctx) error {
 //	@Success		200		{object}	response.BaseResponse
 //	@Failure		500		{object}	response.BaseResponse
 //	@Router			/location/{code} [delete]
-
-func (l *locationHandler) DeleteLocation(ctx *fiber.Ctx) error {
+func (h *locationHandler) DeleteLocation(ctx *fiber.Ctx) error {
 	req := request.DeleteLocationRequest{}
 	user := middleware.AuthUserData{}
 	err := user.Get(ctx)
-	l.exception.PanicIfError(err, false)
+	h.exception.PanicIfError(err, false)
 	req.UserId = user.ID
 	req.Code = ctx.Params("code")
 
-	l.service.DeleteLocation(ctx.Context(), req)
+	h.service.DeleteLocation(ctx.Context(), req)
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",

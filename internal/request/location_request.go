@@ -13,7 +13,6 @@ func (req CreateLocationRequest) Validate() error {
 	return validation.ValidateStruct(&req,
 		validation.Field(&req.Code, validation.Required, validation.Length(2, 16)),
 		validation.Field(&req.Name, validation.Required, validation.Length(5, 255)),
-		validation.Field(&req.IsExit, validation.Required),
 	)
 }
 
@@ -28,7 +27,6 @@ func (req UpdateLocationRequest) Validate() error {
 	return validation.ValidateStruct(&req,
 		validation.Field(&req.Code, validation.Required, validation.Length(2, 16).Error("Location not found")),
 		validation.Field(&req.Name, validation.Required, validation.Length(5, 255)),
-		validation.Field(&req.IsExit, validation.Required),
 		validation.Field(&req.UserId, validation.Required),
 	)
 }
