@@ -258,6 +258,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/history/entry": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Entry History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Create Entry History based on parameter",
+                "operationId": "post-create-entry-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateEntryHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/location": {
             "get": {
                 "security": [
@@ -1267,6 +1313,20 @@ const docTemplate = `{
                 "password_confirmation": {
                     "type": "string",
                     "example": "Password123@"
+                }
+            }
+        },
+        "request.CreateEntryHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "location_code": {
+                    "type": "string"
+                },
+                "vehicle_number": {
+                    "type": "string"
+                },
+                "vehicle_type_code": {
+                    "type": "string"
                 }
             }
         },

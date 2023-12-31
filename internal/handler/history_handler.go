@@ -7,13 +7,16 @@ import (
 	"be-park-ease/internal/request"
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
+	"be-park-ease/middleware"
 	"net/http"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type HistoryHandler interface {
 	AllHistory(ctx *fiber.Ctx) error
+	CreateEntryHistory(ctx *fiber.Ctx) error
 }
 
 type historyHandler struct {
@@ -81,5 +84,39 @@ func (h *historyHandler) AllHistory(ctx *fiber.Ctx) error {
 		Code:    http.StatusOK,
 		Message: "Success!",
 		Data:    res,
+	})
+}
+
+// CreateEntryHistory godoc
+//
+//	@Summary		Post Create Entry History based on parameter
+//	@Description	Create Entry History
+//	@ID				post-create-entry-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CreateEntryHistoryRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/history/entry [post]
+func (h *historyHandler) CreateEntryHistory(ctx *fiber.Ctx) error {
+	req := new(request.CreateEntryHistoryRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+	req.VehicleNumber = strings.ToUpper(req.VehicleNumber)
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	h.service.CreateEntryHistory(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
 	})
 }
