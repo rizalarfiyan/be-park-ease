@@ -674,6 +674,7 @@ paths:
         - username
         - role
         - status
+        - date
         in: query
         name: order_by
         type: string

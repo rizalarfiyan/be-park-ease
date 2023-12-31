@@ -677,7 +677,8 @@ const docTemplate = `{
                             "name",
                             "username",
                             "role",
-                            "status"
+                            "status",
+                            "date"
                         ],
                         "type": "string",
                         "description": "Order by",

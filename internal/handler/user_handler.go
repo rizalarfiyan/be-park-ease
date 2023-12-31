@@ -10,8 +10,9 @@ import (
 	"be-park-ease/internal/sql"
 	"be-park-ease/middleware"
 	"be-park-ease/utils"
-	"github.com/gofiber/fiber/v2"
 	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type UserHandler interface {
@@ -48,7 +49,7 @@ func NewUserHandler(service service.UserService) UserHandler {
 //	@Param			page		query		int		false	"Page"	default(1)
 //	@Param			limit		query		int		false	"Limit"	default(10)
 //	@Param			search		query		string	false	"Search"
-//	@Param			order_by	query		string	false	"Order by"	Enums(name,username,role,status)
+//	@Param			order_by	query		string	false	"Order by"	Enums(name,username,role,status,date)
 //	@Param			order		query		string	false	"Order"		Enums(asc, desc)
 //	@Param			role		query		string	false	"Role"		Enums(admin,karyawan)
 //	@Param			status		query		string	false	"Status"	Enums(active,banned)
@@ -73,6 +74,7 @@ func (h *userHandler) AllUser(ctx *fiber.Ctx) error {
 		"username": "username",
 		"role":     "role",
 		"status":   "status",
+		"date":     "created_at",
 	}
 
 	req.ValidateAndUpdateOrderBy(fieldOrder)
