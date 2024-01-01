@@ -46,6 +46,7 @@ func (r *router) HistoryRoute(handler handler.HistoryHandler) {
 	history.Post("entry", r.mid.Auth(false), handler.CreateEntryHistory)
 	history.Post("calculate", r.mid.Auth(false), handler.CalculatePriceHistory)
 	history.Post("exit", r.mid.Auth(false), handler.CreateExitHistory)
+	history.Post("fine", r.mid.Auth(false), handler.CreateFineHistory)
 }
 
 func (r *router) UserRoute(handler handler.UserHandler) {

@@ -401,6 +401,52 @@
                 }
             }
         },
+        "/history/fine": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Fine History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Create Fine History based on parameter",
+                "operationId": "post-create-fine-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateFineHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/location": {
             "get": {
                 "security": [
@@ -1463,6 +1509,43 @@
                 "price": {
                     "type": "number",
                     "example": 32500
+                }
+            }
+        },
+        "request.CreateFineHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Jl. Ring Road Utara, Ngringin, Condongcatur, Kec. Depok, Kabupaten Sleman"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "My ticket is lost"
+                },
+                "entry_history_id": {
+                    "type": "string",
+                    "example": "H251845879AA5F13"
+                },
+                "identity": {
+                    "type": "string",
+                    "example": "1234567890123456"
+                },
+                "location_code": {
+                    "type": "string",
+                    "example": "DOM002"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Paijo Royo Royo"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 32500
+                },
+                "vehicle_identity": {
+                    "type": "string",
+                    "example": "AB2342NW"
                 }
             }
         },

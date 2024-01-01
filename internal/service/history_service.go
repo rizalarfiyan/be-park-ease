@@ -24,6 +24,7 @@ type HistoryService interface {
 	CreateEntryHistory(ctx context.Context, req request.CreateEntryHistoryRequest)
 	CalculatePriceHistory(ctx context.Context, req request.CalculatePriceHistoryRequest) float64
 	CreateExitHistory(ctx context.Context, req request.CreateExitHistoryRequest)
+	CreateFineHistory(ctx context.Context, req request.CreateFineHistoryRequest)
 }
 
 type historyService struct {
@@ -172,21 +173,25 @@ func (s *historyService) handleErrorExitHistory(err error, isList bool) {
 	}
 }
 
-func (s *historyService) CreateExitHistory(ctx context.Context, req request.CreateExitHistoryRequest) {
-	location, err := s.repoLocation.LocationByCode(ctx, req.LocationCode)
+func (s *historyService) ValidateExitFineHistory(ctx context.Context, locationCode, entryHistoryId string) {
+	location, err := s.repoLocation.LocationByCode(ctx, locationCode)
 	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
 	s.exception.IsNotFoundMessage(location, "Location is not available.", false)
 	if !location.IsExit {
 		s.exception.IsBadRequestMessage("Please use a exit location", false)
 	}
 
-	entryHistory, err := s.repo.GetDataByEntryHistoryId(ctx, req.EntryHistoryId)
+	entryHistory, err := s.repo.GetDataByEntryHistoryId(ctx, entryHistoryId)
 	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
 	s.exception.IsNotFoundMessage(entryHistory, "Entry History is not available.", false)
 
 	if !strings.EqualFold(entryHistory.Type, string(constants.HistoryTypeEntry)) {
 		s.exception.IsUnprocessableEntityMessage("Vehicle already exit or fine, please entry first for vehicle", false)
 	}
+}
+
+func (s *historyService) CreateExitHistory(ctx context.Context, req request.CreateExitHistoryRequest) {
+	s.ValidateExitFineHistory(ctx, req.LocationCode, req.EntryHistoryId)
 
 	payload := sql.CreateExitHistoryParams{
 		EntryHistoryID: req.EntryHistoryId,
@@ -195,7 +200,27 @@ func (s *historyService) CreateExitHistory(ctx context.Context, req request.Crea
 		ExitedBy:       req.UserId,
 	}
 
-	err = s.repo.CreateExitHistory(ctx, payload)
+	err := s.repo.CreateExitHistory(ctx, payload)
+	s.handleErrorExitHistory(err, false)
+	s.exception.PanicIfError(err, false)
+}
+
+func (s *historyService) CreateFineHistory(ctx context.Context, req request.CreateFineHistoryRequest) {
+	s.ValidateExitFineHistory(ctx, req.LocationCode, req.EntryHistoryId)
+
+	payload := sql.CreateFineHistoryParams{
+		EntryHistoryID:  req.EntryHistoryId,
+		LocationCode:    req.LocationCode,
+		Price:           utils.PGNumericFloat64(req.Price),
+		Identity:        req.Identity,
+		VehicleIdentity: req.VehicleIdentity,
+		Name:            req.Name,
+		Address:         req.Address,
+		Description:     req.Description,
+		FinedBy:         req.UserId,
+	}
+
+	err := s.repo.CreateFineHistory(ctx, payload)
 	s.handleErrorExitHistory(err, false)
 	s.exception.PanicIfError(err, false)
 }

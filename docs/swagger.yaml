@@ -65,6 +65,34 @@ definitions:
         example: 32500
         type: number
     type: object
+  request.CreateFineHistoryRequest:
+    properties:
+      address:
+        example: Jl. Ring Road Utara, Ngringin, Condongcatur, Kec. Depok, Kabupaten
+          Sleman
+        type: string
+      description:
+        example: My ticket is lost
+        type: string
+      entry_history_id:
+        example: H251845879AA5F13
+        type: string
+      identity:
+        example: "1234567890123456"
+        type: string
+      location_code:
+        example: DOM002
+        type: string
+      name:
+        example: Paijo Royo Royo
+        type: string
+      price:
+        example: 32500
+        type: number
+      vehicle_identity:
+        example: AB2342NW
+        type: string
+    type: object
   request.CreateLocationRequest:
     properties:
       code:
@@ -537,6 +565,35 @@ paths:
       security:
       - AccessToken: []
       summary: Post Create Exit History based on parameter
+      tags:
+      - history
+  /history/fine:
+    post:
+      consumes:
+      - application/json
+      description: Create Fine History
+      operationId: post-create-fine-history
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateFineHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create Fine History based on parameter
       tags:
       - history
   /location:
