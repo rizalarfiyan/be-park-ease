@@ -1,5 +1,5 @@
 -- name: GetAllHistory :many
-select CAST(eh.id as varchar) as id, eh.location_code, eh.vehicle_type_code, eh.vehicle_number, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
+select CAST(eh.id as varchar) as id, coalesce(fh.location_code, coalesce(exh.location_code, eh.location_code)) as location_code, eh.vehicle_type_code, eh.vehicle_number, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) as date,
        CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
 from entry_history eh
 LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
