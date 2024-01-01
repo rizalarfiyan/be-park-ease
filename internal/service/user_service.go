@@ -11,6 +11,7 @@ import (
 	"be-park-ease/utils"
 	"context"
 	"errors"
+
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -92,14 +93,17 @@ func (s *userService) handleErrorUniqueUser(err error, isList bool) {
 }
 
 func (s *userService) CreateUser(ctx context.Context, req request.CreateUserRequest) {
+	password, err := utils.HashPassword(req.Password)
+	s.exception.PanicIfError(err, false)
+
 	payload := sql.CreateUserParams{
 		Username: req.Username,
-		Password: req.Password,
+		Password: password,
 		Name:     req.Name,
 		Role:     req.Role,
 		Status:   req.Status,
 	}
-	err := s.repo.CreateUser(ctx, payload)
+	err = s.repo.CreateUser(ctx, payload)
 	s.handleErrorUniqueUser(err, false)
 	s.exception.PanicIfError(err, false)
 }
@@ -123,7 +127,9 @@ func (s *userService) UpdateUser(ctx context.Context, req request.UpdateUserRequ
 	}
 
 	if req.Password != "" {
-		payload.Password = req.Password
+		password, err := utils.HashPassword(req.Password)
+		s.exception.PanicIfError(err, false)
+		payload.Password = password
 	}
 
 	if req.Name != "" {

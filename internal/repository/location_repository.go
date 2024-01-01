@@ -12,7 +12,7 @@ import (
 )
 
 type LocationRepository interface {
-	AllLocation(ctx context.Context, req request.BasePagination) (*model.ContentPagination[sql.Location], error)
+	AllLocation(ctx context.Context, req request.GetAllLocationRequest) (*model.ContentPagination[sql.Location], error)
 	LocationByCode(ctx context.Context, code string) (sql.Location, error)
 	CreateLocation(ctx context.Context, req sql.CreateLocationParams) error
 	UpdateLocation(ctx context.Context, req sql.UpdateLocationParams) error
@@ -33,11 +33,15 @@ func NewLocationRepository(db *pgxpool.Pool) LocationRepository {
 	}
 }
 
-func (r locationRepository) AllLocation(ctx context.Context, req request.BasePagination) (*model.ContentPagination[sql.Location], error) {
+func (r locationRepository) AllLocation(ctx context.Context, req request.GetAllLocationRequest) (*model.ContentPagination[sql.Location], error) {
 	var res model.ContentPagination[sql.Location]
 
 	baseBuilder := func(b *utils.QueryBuilder) {
 		b.Where("deleted_at IS NULL")
+
+		if req.IsExit != nil {
+			b.Where("is_exit = $1", *req.IsExit)
+		}
 
 		if req.Search != "" {
 			b.Where("LOWER(name) LIKE $1 OR LOWER(code) LIKE $1", fmt.Sprintf("%%%s%%", req.Search))

@@ -258,6 +258,202 @@ const docTemplate = `{
                 }
             }
         },
+        "/history/calculate": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Calculate Price History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Calculate Price History based on parameter",
+                "operationId": "post-calculate-price-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CalculatePriceHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/history/entry": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Entry History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Create Entry History based on parameter",
+                "operationId": "post-create-entry-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateEntryHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/history/exit": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Exit History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Create Exit History based on parameter",
+                "operationId": "post-create-exit-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateExitHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/history/fine": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Fine History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Create Fine History based on parameter",
+                "operationId": "post-create-fine-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateFineHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/location": {
             "get": {
                 "security": [
@@ -318,6 +514,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Order",
                         "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Is Exit",
+                        "name": "is_exit",
                         "in": "query"
                     }
                 ],
@@ -677,7 +879,8 @@ const docTemplate = `{
                             "name",
                             "username",
                             "role",
-                            "status"
+                            "status",
+                            "date"
                         ],
                         "type": "string",
                         "description": "Order by",
@@ -1252,6 +1455,19 @@ const docTemplate = `{
                 }
             }
         },
+        "request.CalculatePriceHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "entry_history_id": {
+                    "type": "string",
+                    "example": "H251845879AA5F13"
+                },
+                "is_fine": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
         "request.ChangePasswordRequest": {
             "type": "object",
             "properties": {
@@ -1266,6 +1482,77 @@ const docTemplate = `{
                 "password_confirmation": {
                     "type": "string",
                     "example": "Password123@"
+                }
+            }
+        },
+        "request.CreateEntryHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "location_code": {
+                    "type": "string",
+                    "example": "DOM001"
+                },
+                "vehicle_number": {
+                    "type": "string",
+                    "example": "AB2342NW"
+                },
+                "vehicle_type_code": {
+                    "type": "string",
+                    "example": "K001"
+                }
+            }
+        },
+        "request.CreateExitHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "entry_history_id": {
+                    "type": "string",
+                    "example": "H251845879AA5F13"
+                },
+                "location_code": {
+                    "type": "string",
+                    "example": "DOM002"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 32500
+                }
+            }
+        },
+        "request.CreateFineHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Jl. Ring Road Utara, Ngringin, Condongcatur, Kec. Depok, Kabupaten Sleman"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "My ticket is lost"
+                },
+                "entry_history_id": {
+                    "type": "string",
+                    "example": "H251845879AA5F13"
+                },
+                "identity": {
+                    "type": "string",
+                    "example": "1234567890123456"
+                },
+                "location_code": {
+                    "type": "string",
+                    "example": "DOM002"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Paijo Royo Royo"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 32500
+                },
+                "vehicle_identity": {
+                    "type": "string",
+                    "example": "AB2342NW"
                 }
             }
         },

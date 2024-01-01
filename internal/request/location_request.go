@@ -2,6 +2,11 @@ package request
 
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
+type GetAllLocationRequest struct {
+	BasePagination
+	IsExit *bool
+}
+
 type CreateLocationRequest struct {
 	Code   string `json:"code" example:"D1"`
 	Name   string `json:"name" example:"DOM 1"`

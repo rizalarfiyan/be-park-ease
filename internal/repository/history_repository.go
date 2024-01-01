@@ -14,6 +14,11 @@ import (
 
 type HistoryRepository interface {
 	GetAllHistory(ctx context.Context, req request.AllHistoryRequest) (*model.ContentPagination[sql.GetAllHistoryRow], error)
+	GetLastHistoryByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryByVehicleNumberRow, error)
+	GetDataByEntryHistoryId(ctx context.Context, entryHistoryId string) (sql.GetDataByEntryHistoryIdRow, error)
+	CreateEntryHistory(ctx context.Context, req sql.CreateEntryHistoryParams) error
+	CreateExitHistory(ctx context.Context, req sql.CreateExitHistoryParams) error
+	CreateFineHistory(ctx context.Context, req sql.CreateFineHistoryParams) error
 }
 
 type historyRepository struct {
@@ -77,4 +82,24 @@ func (r historyRepository) GetAllHistory(ctx context.Context, req request.AllHis
 	res.Content = entryHistory
 	res.Count = count
 	return &res, nil
+}
+
+func (r historyRepository) GetLastHistoryByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryByVehicleNumberRow, error) {
+	return r.query.GetLastHistoryByVehicleNumber(ctx, vehicleNumber)
+}
+
+func (r historyRepository) GetDataByEntryHistoryId(ctx context.Context, entryHistoryId string) (sql.GetDataByEntryHistoryIdRow, error) {
+	return r.query.GetDataByEntryHistoryId(ctx, entryHistoryId)
+}
+
+func (r historyRepository) CreateEntryHistory(ctx context.Context, req sql.CreateEntryHistoryParams) error {
+	return r.query.CreateEntryHistory(ctx, req)
+}
+
+func (r historyRepository) CreateExitHistory(ctx context.Context, req sql.CreateExitHistoryParams) error {
+	return r.query.CreateExitHistory(ctx, req)
+}
+
+func (r historyRepository) CreateFineHistory(ctx context.Context, req sql.CreateFineHistoryParams) error {
+	return r.query.CreateFineHistory(ctx, req)
 }

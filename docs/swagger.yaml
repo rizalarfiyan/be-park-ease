@@ -20,6 +20,15 @@ definitions:
       username:
         type: string
     type: object
+  request.CalculatePriceHistoryRequest:
+    properties:
+      entry_history_id:
+        example: H251845879AA5F13
+        type: string
+      is_fine:
+        example: false
+        type: boolean
+    type: object
   request.ChangePasswordRequest:
     properties:
       old_password:
@@ -30,6 +39,58 @@ definitions:
         type: string
       password_confirmation:
         example: Password123@
+        type: string
+    type: object
+  request.CreateEntryHistoryRequest:
+    properties:
+      location_code:
+        example: DOM001
+        type: string
+      vehicle_number:
+        example: AB2342NW
+        type: string
+      vehicle_type_code:
+        example: K001
+        type: string
+    type: object
+  request.CreateExitHistoryRequest:
+    properties:
+      entry_history_id:
+        example: H251845879AA5F13
+        type: string
+      location_code:
+        example: DOM002
+        type: string
+      price:
+        example: 32500
+        type: number
+    type: object
+  request.CreateFineHistoryRequest:
+    properties:
+      address:
+        example: Jl. Ring Road Utara, Ngringin, Condongcatur, Kec. Depok, Kabupaten
+          Sleman
+        type: string
+      description:
+        example: My ticket is lost
+        type: string
+      entry_history_id:
+        example: H251845879AA5F13
+        type: string
+      identity:
+        example: "1234567890123456"
+        type: string
+      location_code:
+        example: DOM002
+        type: string
+      name:
+        example: Paijo Royo Royo
+        type: string
+      price:
+        example: 32500
+        type: number
+      vehicle_identity:
+        example: AB2342NW
         type: string
     type: object
   request.CreateLocationRequest:
@@ -414,6 +475,127 @@ paths:
       summary: Get All History based on parameter
       tags:
       - history
+  /history/calculate:
+    post:
+      consumes:
+      - application/json
+      description: Calculate Price History
+      operationId: post-calculate-price-history
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CalculatePriceHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  type: number
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Calculate Price History based on parameter
+      tags:
+      - history
+  /history/entry:
+    post:
+      consumes:
+      - application/json
+      description: Create Entry History
+      operationId: post-create-entry-history
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateEntryHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create Entry History based on parameter
+      tags:
+      - history
+  /history/exit:
+    post:
+      consumes:
+      - application/json
+      description: Create Exit History
+      operationId: post-create-exit-history
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateExitHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create Exit History based on parameter
+      tags:
+      - history
+  /history/fine:
+    post:
+      consumes:
+      - application/json
+      description: Create Fine History
+      operationId: post-create-fine-history
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateFineHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Post Create Fine History based on parameter
+      tags:
+      - history
   /location:
     get:
       consumes:
@@ -451,6 +633,10 @@ paths:
         in: query
         name: order
         type: string
+      - description: Is Exit
+        in: query
+        name: is_exit
+        type: boolean
       produces:
       - application/json
       responses:
@@ -674,6 +860,7 @@ paths:
         - username
         - role
         - status
+        - date
         in: query
         name: order_by
         type: string

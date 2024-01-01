@@ -7,13 +7,19 @@ import (
 	"be-park-ease/internal/request"
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
+	"be-park-ease/middleware"
 	"net/http"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type HistoryHandler interface {
 	AllHistory(ctx *fiber.Ctx) error
+	CreateEntryHistory(ctx *fiber.Ctx) error
+	CalculatePriceHistory(ctx *fiber.Ctx) error
+	CreateExitHistory(ctx *fiber.Ctx) error
+	CreateFineHistory(ctx *fiber.Ctx) error
 }
 
 type historyHandler struct {
@@ -81,5 +87,134 @@ func (h *historyHandler) AllHistory(ctx *fiber.Ctx) error {
 		Code:    http.StatusOK,
 		Message: "Success!",
 		Data:    res,
+	})
+}
+
+// CreateEntryHistory godoc
+//
+//	@Summary		Post Create Entry History based on parameter
+//	@Description	Create Entry History
+//	@ID				post-create-entry-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CreateEntryHistoryRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/history/entry [post]
+func (h *historyHandler) CreateEntryHistory(ctx *fiber.Ctx) error {
+	req := new(request.CreateEntryHistoryRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+	req.VehicleNumber = strings.ToUpper(req.VehicleNumber)
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	h.service.CreateEntryHistory(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+	})
+}
+
+// CalculatePriceHistory godoc
+//
+//	@Summary		Post Calculate Price History based on parameter
+//	@Description	Calculate Price History
+//	@ID				post-calculate-price-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CalculatePriceHistoryRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse{data=float64}
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/history/calculate [post]
+func (h *historyHandler) CalculatePriceHistory(ctx *fiber.Ctx) error {
+	req := new(request.CalculatePriceHistoryRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	res := h.service.CalculatePriceHistory(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+		Data:    res,
+	})
+}
+
+// CreateExitHistory godoc
+//
+//	@Summary		Post Create Exit History based on parameter
+//	@Description	Create Exit History
+//	@ID				post-create-exit-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CreateExitHistoryRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/history/exit [post]
+func (h *historyHandler) CreateExitHistory(ctx *fiber.Ctx) error {
+	req := new(request.CreateExitHistoryRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	h.service.CreateExitHistory(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+	})
+}
+
+// CreateFineHistory godoc
+//
+//	@Summary		Post Create Fine History based on parameter
+//	@Description	Create Fine History
+//	@ID				post-create-fine-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CreateFineHistoryRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/history/fine [post]
+func (h *historyHandler) CreateFineHistory(ctx *fiber.Ctx) error {
+	req := new(request.CreateFineHistoryRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	h.service.CreateFineHistory(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
 	})
 }
