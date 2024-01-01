@@ -33,8 +33,7 @@ func (r *settingRepository) CreateOrUpdateSetting(ctx context.Context, req []mod
 	var args []any
 	query := `INSERT INTO setting (key, value)
         VALUES %s ON CONFLICT ON CONSTRAINT setting_pkey DO UPDATE SET
-        value = EXCLUDED.value,
-        description = EXCLUDED.description`
+        value = EXCLUDED.value`
 
 	value := ""
 	for idx, setting := range req {
