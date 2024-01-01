@@ -23,6 +23,7 @@ type Exception interface {
 	IsNotFoundMessage(value interface{}, message string, isList bool)
 	IsNotFound(value interface{}, isList bool, modules ...string)
 	IsUnprocessableEntity(value interface{}, message string, isList bool)
+	IsUnprocessableEntityMessage(message string, isList bool)
 	IsBadRequestMessage(message string, isList bool)
 	IsBadRequest(value interface{}, message string, isList bool)
 	IsBadRequestErr(err error, message string, isList bool)
@@ -106,6 +107,10 @@ func (e *exception) IsUnprocessableEntity(value interface{}, message string, isL
 	e.isEmptyCallback(value, isList, func(isList bool, data interface{}) *response.BaseResponse {
 		return response.NewErrorMessage(http.StatusUnprocessableEntity, message, data)
 	})
+}
+func (e *exception) IsUnprocessableEntityMessage(message string, isList bool) {
+	data := e.DefaultData(isList)
+	panic(response.NewErrorMessage(http.StatusBadRequest, message, data))
 }
 
 func (e *exception) IsBadRequestMessage(message string, isList bool) {

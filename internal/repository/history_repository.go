@@ -15,6 +15,7 @@ import (
 type HistoryRepository interface {
 	GetAllHistory(ctx context.Context, req request.AllHistoryRequest) (*model.ContentPagination[sql.GetAllHistoryRow], error)
 	GetLastHistoryByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryByVehicleNumberRow, error)
+	GetLastHistoryWithPriceByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryWithPriceByVehicleNumberRow, error)
 	CreateEntryHistory(ctx context.Context, req sql.CreateEntryHistoryParams) error
 	CreateExitHistory(ctx context.Context, req sql.CreateExitHistoryParams) error
 	CreateFineHistory(ctx context.Context, req sql.CreateFineHistoryParams) error
@@ -85,6 +86,10 @@ func (r historyRepository) GetAllHistory(ctx context.Context, req request.AllHis
 
 func (r historyRepository) GetLastHistoryByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryByVehicleNumberRow, error) {
 	return r.query.GetLastHistoryByVehicleNumber(ctx, vehicleNumber)
+}
+
+func (r historyRepository) GetLastHistoryWithPriceByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryWithPriceByVehicleNumberRow, error) {
+	return r.query.GetLastHistoryWithPriceByVehicleNumber(ctx, vehicleNumber)
 }
 
 func (r historyRepository) CreateEntryHistory(ctx context.Context, req sql.CreateEntryHistoryParams) error {

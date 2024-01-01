@@ -34,3 +34,16 @@ func (req CreateEntryHistoryRequest) Validate() error {
 		validation.Field(&req.VehicleNumber, validation.Required, validation.Length(3, 16), constants.ValidationVehicleNumber),
 	)
 }
+
+type CalculatePriceHistoryRequest struct {
+	VehicleTypeCode string `json:"vehicle_type_code"`
+	VehicleNumber   string `json:"vehicle_number"`
+	IsFine          bool   `json:"is_fine"`
+}
+
+func (req CalculatePriceHistoryRequest) Validate() error {
+	return validation.ValidateStruct(&req,
+		validation.Field(&req.VehicleTypeCode, validation.Required, validation.Length(2, 16).Error("Vehicle Type not found")),
+		validation.Field(&req.VehicleNumber, validation.Required, validation.Length(3, 16), constants.ValidationVehicleNumber),
+	)
+}

@@ -14,6 +14,7 @@ import (
 	"errors"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
+	"math"
 	"strings"
 	"time"
 )
@@ -21,21 +22,24 @@ import (
 type HistoryService interface {
 	AllHistory(ctx context.Context, req request.AllHistoryRequest) response.BaseResponsePagination[response.EntryHistory]
 	CreateEntryHistory(ctx context.Context, req request.CreateEntryHistoryRequest)
+	CalculatePriceHistory(ctx context.Context, req request.CalculatePriceHistoryRequest) float64
 }
 
 type historyService struct {
-	repo         repository.HistoryRepository
-	repoLocation repository.LocationRepository
-	exception    exception.Exception
-	conf         config.Config
+	repo           repository.HistoryRepository
+	repoLocation   repository.LocationRepository
+	exception      exception.Exception
+	conf           config.Config
+	serviceSetting SettingService
 }
 
-func NewHistoryService(repo repository.HistoryRepository, repoLocation repository.LocationRepository) HistoryService {
+func NewHistoryService(repo repository.HistoryRepository, repoLocation repository.LocationRepository, serviceSetting SettingService) HistoryService {
 	return &historyService{
-		repo:         repo,
-		repoLocation: repoLocation,
-		exception:    exception.NewException("history-service"),
-		conf:         *config.Get(),
+		repo:           repo,
+		repoLocation:   repoLocation,
+		exception:      exception.NewException("history-service"),
+		conf:           *config.Get(),
+		serviceSetting: serviceSetting,
 	}
 }
 
@@ -92,7 +96,7 @@ func (s *historyService) CreateEntryHistory(ctx context.Context, req request.Cre
 	lastHistory, err := s.repo.GetLastHistoryByVehicleNumber(ctx, req.VehicleNumber)
 	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
 	if !utils.IsEmpty(lastHistory) && strings.EqualFold(lastHistory.Type, string(constants.HistoryTypeEntry)) {
-		s.exception.IsBadRequestMessage("Vehicle already entry, please check your ticket to exit", false)
+		s.exception.IsUnprocessableEntityMessage("Vehicle already entry, please check your ticket to exit", false)
 	}
 
 	location, err := s.repoLocation.LocationByCode(ctx, req.LocationCode)
@@ -113,4 +117,41 @@ func (s *historyService) CreateEntryHistory(ctx context.Context, req request.Cre
 	err = s.repo.CreateEntryHistory(ctx, payload)
 	s.handleErrorEntryHistory(err, false)
 	s.exception.PanicIfError(err, false)
+}
+
+func (s *historyService) CalculatePriceHistory(ctx context.Context, req request.CalculatePriceHistoryRequest) float64 {
+	lastHistory, err := s.repo.GetLastHistoryWithPriceByVehicleNumber(ctx, req.VehicleNumber)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	if utils.IsEmpty(lastHistory) {
+		s.exception.IsUnprocessableEntityMessage("Vehicle not found, please entry first for vehicle", false)
+	}
+
+	if !utils.IsEmpty(lastHistory) && !strings.EqualFold(lastHistory.Type, string(constants.HistoryTypeEntry)) {
+		s.exception.IsUnprocessableEntityMessage("Vehicle already exit or fine, please entry first for vehicle", false)
+	}
+
+	setting := s.serviceSetting.GetAllSetting(ctx)
+	var vehicleTypePrice float64
+	rawPrice, err := lastHistory.Price.Float64Value()
+	if lastHistory.Price.Valid && err == nil {
+		vehicleTypePrice = rawPrice.Float64
+	}
+
+	now := time.Now()
+	entryTime := now
+	if lastHistory.Date.Valid {
+		entryTime = lastHistory.Date.Time
+	}
+
+	price := 1 * vehicleTypePrice
+	nextHours := math.Ceil(now.Sub(entryTime).Hours()) - 1
+	if nextHours > 0 {
+		price += nextHours * (float64(setting.NextHourCalculation) / 100) * vehicleTypePrice
+	}
+
+	if req.IsFine {
+		price += float64(setting.FineTicketCalculation) / 100 * vehicleTypePrice
+	}
+
+	return price
 }

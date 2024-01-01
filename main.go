@@ -98,10 +98,10 @@ func main() {
 	// service
 	authService := service.NewAuthService(authRepository)
 	locationService := service.NewLocationService(locationRepository)
-	historyService := service.NewHistoryService(historyRepository, locationRepository)
 	userService := service.NewUserService(userRepository)
 	settingService := service.NewSettingService(settingRepository)
 	vehicleTypeService := service.NewVehicleTypeService(vehicleTypeRepository)
+	historyService := service.NewHistoryService(historyRepository, locationRepository, settingService)
 
 	// handler
 	baseHandler := handler.NewBaseHandler()

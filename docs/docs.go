@@ -258,6 +258,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/history/calculate": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Calculate Price History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Calculate Price History based on parameter",
+                "operationId": "post-calculate-price-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CalculatePriceHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/history/entry": {
             "post": {
                 "security": [
@@ -1295,6 +1353,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.CalculatePriceHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "is_fine": {
+                    "type": "boolean"
+                },
+                "vehicle_number": {
+                    "type": "string"
+                },
+                "vehicle_type_code": {
                     "type": "string"
                 }
             }

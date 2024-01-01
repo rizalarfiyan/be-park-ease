@@ -17,6 +17,7 @@ import (
 type HistoryHandler interface {
 	AllHistory(ctx *fiber.Ctx) error
 	CreateEntryHistory(ctx *fiber.Ctx) error
+	CalculatePriceHistory(ctx *fiber.Ctx) error
 }
 
 type historyHandler struct {
@@ -118,5 +119,35 @@ func (h *historyHandler) CreateEntryHistory(ctx *fiber.Ctx) error {
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
+	})
+}
+
+// CalculatePriceHistory godoc
+//
+//	@Summary		Post Calculate Price History based on parameter
+//	@Description	Calculate Price History
+//	@ID				post-calculate-price-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CalculatePriceHistoryRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse{data=float64}
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/history/calculate [post]
+func (h *historyHandler) CalculatePriceHistory(ctx *fiber.Ctx) error {
+	req := new(request.CalculatePriceHistoryRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+	req.VehicleNumber = strings.ToUpper(req.VehicleNumber)
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	res := h.service.CalculatePriceHistory(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+		Data:    res,
 	})
 }
