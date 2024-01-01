@@ -146,6 +146,37 @@ func (q *Queries) GetAllHistory(ctx context.Context) ([]GetAllHistoryRow, error)
 	return items, nil
 }
 
+const getDataByEntryHistoryId = `-- name: GetDataByEntryHistoryId :one
+select eh.id, vt.price, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
+   CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
+from entry_history eh
+LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
+LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
+JOIN vehicle_type vt on eh.vehicle_type_code = vt.code
+where eh.id = $1
+ORDER BY date DESC
+LIMIT 1
+`
+
+type GetDataByEntryHistoryIdRow struct {
+	ID    interface{}
+	Price pgtype.Numeric
+	Date  pgtype.Timestamp
+	Type  string
+}
+
+func (q *Queries) GetDataByEntryHistoryId(ctx context.Context, id interface{}) (GetDataByEntryHistoryIdRow, error) {
+	row := q.db.QueryRow(ctx, getDataByEntryHistoryId, id)
+	var i GetDataByEntryHistoryIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Price,
+		&i.Date,
+		&i.Type,
+	)
+	return i, err
+}
+
 const getLastHistoryByVehicleNumber = `-- name: GetLastHistoryByVehicleNumber :one
 select eh.vehicle_number, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
        CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
@@ -167,60 +198,5 @@ func (q *Queries) GetLastHistoryByVehicleNumber(ctx context.Context, vehicleNumb
 	row := q.db.QueryRow(ctx, getLastHistoryByVehicleNumber, vehicleNumber)
 	var i GetLastHistoryByVehicleNumberRow
 	err := row.Scan(&i.VehicleNumber, &i.Date, &i.Type)
-	return i, err
-}
-
-const getLastHistoryWithPriceByVehicleNumber = `-- name: GetLastHistoryWithPriceByVehicleNumber :one
-select eh.vehicle_number, vt.price, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
-       CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
-from entry_history eh
-LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
-LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
-JOIN vehicle_type vt on eh.vehicle_type_code = vt.code
-WHERE eh.vehicle_number = $1
-ORDER BY date DESC
-LIMIT 1
-`
-
-type GetLastHistoryWithPriceByVehicleNumberRow struct {
-	VehicleNumber string
-	Price         pgtype.Numeric
-	Date          pgtype.Timestamp
-	Type          string
-}
-
-func (q *Queries) GetLastHistoryWithPriceByVehicleNumber(ctx context.Context, vehicleNumber string) (GetLastHistoryWithPriceByVehicleNumberRow, error) {
-	row := q.db.QueryRow(ctx, getLastHistoryWithPriceByVehicleNumber, vehicleNumber)
-	var i GetLastHistoryWithPriceByVehicleNumberRow
-	err := row.Scan(
-		&i.VehicleNumber,
-		&i.Price,
-		&i.Date,
-		&i.Type,
-	)
-	return i, err
-}
-
-const getTypeByEntryHistoryId = `-- name: GetTypeByEntryHistoryId :one
-select eh.id, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
-   CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
-from entry_history eh
-LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
-LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
-where eh.id = $1
-ORDER BY date DESC
-LIMIT 1
-`
-
-type GetTypeByEntryHistoryIdRow struct {
-	ID   interface{}
-	Date pgtype.Timestamp
-	Type string
-}
-
-func (q *Queries) GetTypeByEntryHistoryId(ctx context.Context, id interface{}) (GetTypeByEntryHistoryIdRow, error) {
-	row := q.db.QueryRow(ctx, getTypeByEntryHistoryId, id)
-	var i GetTypeByEntryHistoryIdRow
-	err := row.Scan(&i.ID, &i.Date, &i.Type)
 	return i, err
 }

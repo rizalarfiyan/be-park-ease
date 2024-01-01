@@ -22,12 +22,12 @@ definitions:
     type: object
   request.CalculatePriceHistoryRequest:
     properties:
+      entry_history_id:
+        example: H251845879AA5F13
+        type: string
       is_fine:
+        example: false
         type: boolean
-      vehicle_number:
-        type: string
-      vehicle_type_code:
-        type: string
     type: object
   request.ChangePasswordRequest:
     properties:
@@ -44,19 +44,25 @@ definitions:
   request.CreateEntryHistoryRequest:
     properties:
       location_code:
+        example: DOM001
         type: string
       vehicle_number:
+        example: AB2342NW
         type: string
       vehicle_type_code:
+        example: K001
         type: string
     type: object
   request.CreateExitHistoryRequest:
     properties:
       entry_history_id:
+        example: H251845879AA5F13
         type: string
       location_code:
+        example: DOM002
         type: string
       price:
+        example: 32500
         type: number
     type: object
   request.CreateLocationRequest:

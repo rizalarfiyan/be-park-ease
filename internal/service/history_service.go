@@ -121,27 +121,25 @@ func (s *historyService) CreateEntryHistory(ctx context.Context, req request.Cre
 }
 
 func (s *historyService) CalculatePriceHistory(ctx context.Context, req request.CalculatePriceHistoryRequest) float64 {
-	lastHistory, err := s.repo.GetLastHistoryWithPriceByVehicleNumber(ctx, req.VehicleNumber)
+	entryHistory, err := s.repo.GetDataByEntryHistoryId(ctx, req.EntryHistoryId)
 	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
-	if utils.IsEmpty(lastHistory) {
-		s.exception.IsUnprocessableEntityMessage("Vehicle not found, please entry first for vehicle", false)
-	}
+	s.exception.IsNotFoundMessage(entryHistory, "Entry History is not available.", false)
 
-	if !utils.IsEmpty(lastHistory) && !strings.EqualFold(lastHistory.Type, string(constants.HistoryTypeEntry)) {
+	if !utils.IsEmpty(entryHistory) && !strings.EqualFold(entryHistory.Type, string(constants.HistoryTypeEntry)) {
 		s.exception.IsUnprocessableEntityMessage("Vehicle already exit or fine, please entry first for vehicle", false)
 	}
 
 	setting := s.serviceSetting.GetAllSetting(ctx)
 	var vehicleTypePrice float64
-	rawPrice, err := lastHistory.Price.Float64Value()
-	if lastHistory.Price.Valid && err == nil {
+	rawPrice, err := entryHistory.Price.Float64Value()
+	if entryHistory.Price.Valid && err == nil {
 		vehicleTypePrice = rawPrice.Float64
 	}
 
 	now := time.Now()
 	entryTime := now
-	if lastHistory.Date.Valid {
-		entryTime = lastHistory.Date.Time
+	if entryHistory.Date.Valid {
+		entryTime = entryHistory.Date.Time
 	}
 
 	price := 1 * vehicleTypePrice
@@ -182,7 +180,7 @@ func (s *historyService) CreateExitHistory(ctx context.Context, req request.Crea
 		s.exception.IsBadRequestMessage("Please use a exit location", false)
 	}
 
-	entryHistory, err := s.repo.GetTypeByEntryHistoryId(ctx, req.EntryHistoryId)
+	entryHistory, err := s.repo.GetDataByEntryHistoryId(ctx, req.EntryHistoryId)
 	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
 	s.exception.IsNotFoundMessage(entryHistory, "Entry History is not available.", false)
 

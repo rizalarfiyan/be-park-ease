@@ -21,9 +21,9 @@ func (r *AllHistoryRequest) Normalize() {
 }
 
 type CreateEntryHistoryRequest struct {
-	LocationCode    string `json:"location_code"`
-	VehicleTypeCode string `json:"vehicle_type_code"`
-	VehicleNumber   string `json:"vehicle_number"`
+	LocationCode    string `json:"location_code" example:"DOM001"`
+	VehicleTypeCode string `json:"vehicle_type_code" example:"K001"`
+	VehicleNumber   string `json:"vehicle_number" example:"AB2342NW"`
 	UserId          int32  `json:"-"`
 }
 
@@ -36,22 +36,20 @@ func (req CreateEntryHistoryRequest) Validate() error {
 }
 
 type CalculatePriceHistoryRequest struct {
-	VehicleTypeCode string `json:"vehicle_type_code"`
-	VehicleNumber   string `json:"vehicle_number"`
-	IsFine          bool   `json:"is_fine"`
+	EntryHistoryId string `json:"entry_history_id" example:"H251845879AA5F13"`
+	IsFine         bool   `json:"is_fine" example:"false"`
 }
 
 func (req CalculatePriceHistoryRequest) Validate() error {
 	return validation.ValidateStruct(&req,
-		validation.Field(&req.VehicleTypeCode, validation.Required, validation.Length(2, 16).Error("Vehicle Type not found")),
-		validation.Field(&req.VehicleNumber, validation.Required, validation.Length(3, 16), constants.ValidationVehicleNumber),
+		validation.Field(&req.EntryHistoryId, validation.Required, validation.Length(14, 16).Error("Entry History not found")),
 	)
 }
 
 type CreateExitHistoryRequest struct {
-	EntryHistoryId string  `json:"entry_history_id"`
-	LocationCode   string  `json:"location_code"`
-	Price          float64 `json:"price"`
+	EntryHistoryId string  `json:"entry_history_id" example:"H251845879AA5F13"`
+	LocationCode   string  `json:"location_code" example:"DOM002"`
+	Price          float64 `json:"price" example:"32500"`
 	UserId         int32   `json:"-"`
 }
 

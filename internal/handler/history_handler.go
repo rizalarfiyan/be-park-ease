@@ -140,7 +140,6 @@ func (h *historyHandler) CalculatePriceHistory(ctx *fiber.Ctx) error {
 	req := new(request.CalculatePriceHistoryRequest)
 	err := ctx.BodyParser(req)
 	h.exception.IsBadRequestErr(err, "Invalid request body", false)
-	req.VehicleNumber = strings.ToUpper(req.VehicleNumber)
 
 	err = req.Validate()
 	h.exception.IsErrValidation(err, false)

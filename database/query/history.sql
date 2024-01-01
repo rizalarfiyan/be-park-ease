@@ -20,23 +20,13 @@ WHERE eh.vehicle_number = $1
 ORDER BY date DESC
 LIMIT 1;
 
--- name: GetLastHistoryWithPriceByVehicleNumber :one
-select eh.vehicle_number, vt.price, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
-       CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
-from entry_history eh
-LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
-LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
-JOIN vehicle_type vt on eh.vehicle_type_code = vt.code
-WHERE eh.vehicle_number = $1
-ORDER BY date DESC
-LIMIT 1;
-
--- name: GetTypeByEntryHistoryId :one
-select eh.id, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
+-- name: GetDataByEntryHistoryId :one
+select eh.id, vt.price, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
    CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
 from entry_history eh
 LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
 LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
+JOIN vehicle_type vt on eh.vehicle_type_code = vt.code
 where eh.id = $1
 ORDER BY date DESC
 LIMIT 1;

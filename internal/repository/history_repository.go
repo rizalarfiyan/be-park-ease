@@ -15,8 +15,7 @@ import (
 type HistoryRepository interface {
 	GetAllHistory(ctx context.Context, req request.AllHistoryRequest) (*model.ContentPagination[sql.GetAllHistoryRow], error)
 	GetLastHistoryByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryByVehicleNumberRow, error)
-	GetLastHistoryWithPriceByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryWithPriceByVehicleNumberRow, error)
-	GetTypeByEntryHistoryId(ctx context.Context, entryHistoryId string) (sql.GetTypeByEntryHistoryIdRow, error)
+	GetDataByEntryHistoryId(ctx context.Context, entryHistoryId string) (sql.GetDataByEntryHistoryIdRow, error)
 	CreateEntryHistory(ctx context.Context, req sql.CreateEntryHistoryParams) error
 	CreateExitHistory(ctx context.Context, req sql.CreateExitHistoryParams) error
 	CreateFineHistory(ctx context.Context, req sql.CreateFineHistoryParams) error
@@ -89,12 +88,8 @@ func (r historyRepository) GetLastHistoryByVehicleNumber(ctx context.Context, ve
 	return r.query.GetLastHistoryByVehicleNumber(ctx, vehicleNumber)
 }
 
-func (r historyRepository) GetLastHistoryWithPriceByVehicleNumber(ctx context.Context, vehicleNumber string) (sql.GetLastHistoryWithPriceByVehicleNumberRow, error) {
-	return r.query.GetLastHistoryWithPriceByVehicleNumber(ctx, vehicleNumber)
-}
-
-func (r historyRepository) GetTypeByEntryHistoryId(ctx context.Context, entryHistoryId string) (sql.GetTypeByEntryHistoryIdRow, error) {
-	return r.query.GetTypeByEntryHistoryId(ctx, entryHistoryId)
+func (r historyRepository) GetDataByEntryHistoryId(ctx context.Context, entryHistoryId string) (sql.GetDataByEntryHistoryIdRow, error) {
+	return r.query.GetDataByEntryHistoryId(ctx, entryHistoryId)
 }
 
 func (r historyRepository) CreateEntryHistory(ctx context.Context, req sql.CreateEntryHistoryParams) error {

@@ -1412,14 +1412,13 @@ const docTemplate = `{
         "request.CalculatePriceHistoryRequest": {
             "type": "object",
             "properties": {
+                "entry_history_id": {
+                    "type": "string",
+                    "example": "H251845879AA5F13"
+                },
                 "is_fine": {
-                    "type": "boolean"
-                },
-                "vehicle_number": {
-                    "type": "string"
-                },
-                "vehicle_type_code": {
-                    "type": "string"
+                    "type": "boolean",
+                    "example": false
                 }
             }
         },
@@ -1444,13 +1443,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "location_code": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "DOM001"
                 },
                 "vehicle_number": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "AB2342NW"
                 },
                 "vehicle_type_code": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "K001"
                 }
             }
         },
@@ -1458,13 +1460,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "entry_history_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "H251845879AA5F13"
                 },
                 "location_code": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "DOM002"
                 },
                 "price": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 32500
                 }
             }
         },
