@@ -23,6 +23,7 @@ type HistoryService interface {
 	AllHistory(ctx context.Context, req request.AllHistoryRequest) response.BaseResponsePagination[response.EntryHistory]
 	CreateEntryHistory(ctx context.Context, req request.CreateEntryHistoryRequest)
 	CalculatePriceHistory(ctx context.Context, req request.CalculatePriceHistoryRequest) float64
+	CreateExitHistory(ctx context.Context, req request.CreateExitHistoryRequest)
 }
 
 type historyService struct {
@@ -154,4 +155,49 @@ func (s *historyService) CalculatePriceHistory(ctx context.Context, req request.
 	}
 
 	return price
+}
+
+func (s *historyService) handleErrorExitHistory(err error, isList bool) {
+	var pgErr *pgconn.PgError
+	ok := errors.As(err, &pgErr)
+	if !ok {
+		return
+	}
+
+	if pgErr.Code != pgerrcode.ForeignKeyViolation {
+		return
+	}
+
+	switch pgErr.ConstraintName {
+	case "exit_history_location_code_fkey":
+		s.exception.IsBadRequestMessage("Location is not available.", isList)
+	}
+}
+
+func (s *historyService) CreateExitHistory(ctx context.Context, req request.CreateExitHistoryRequest) {
+	location, err := s.repoLocation.LocationByCode(ctx, req.LocationCode)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	s.exception.IsNotFoundMessage(location, "Location is not available.", false)
+	if !location.IsExit {
+		s.exception.IsBadRequestMessage("Please use a exit location", false)
+	}
+
+	entryHistory, err := s.repo.GetTypeByEntryHistoryId(ctx, req.EntryHistoryId)
+	s.exception.PanicIfErrorWithoutNoSqlResult(err, false)
+	s.exception.IsNotFoundMessage(entryHistory, "Entry History is not available.", false)
+
+	if !strings.EqualFold(entryHistory.Type, string(constants.HistoryTypeEntry)) {
+		s.exception.IsUnprocessableEntityMessage("Vehicle already exit or fine, please entry first for vehicle", false)
+	}
+
+	payload := sql.CreateExitHistoryParams{
+		EntryHistoryID: req.EntryHistoryId,
+		LocationCode:   req.LocationCode,
+		Price:          utils.PGNumericFloat64(req.Price),
+		ExitedBy:       req.UserId,
+	}
+
+	err = s.repo.CreateExitHistory(ctx, payload)
+	s.handleErrorExitHistory(err, false)
+	s.exception.PanicIfError(err, false)
 }

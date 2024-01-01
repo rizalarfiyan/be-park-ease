@@ -200,3 +200,27 @@ func (q *Queries) GetLastHistoryWithPriceByVehicleNumber(ctx context.Context, ve
 	)
 	return i, err
 }
+
+const getTypeByEntryHistoryId = `-- name: GetTypeByEntryHistoryId :one
+select eh.id, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
+   CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
+from entry_history eh
+LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
+LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
+where eh.id = $1
+ORDER BY date DESC
+LIMIT 1
+`
+
+type GetTypeByEntryHistoryIdRow struct {
+	ID   interface{}
+	Date pgtype.Timestamp
+	Type string
+}
+
+func (q *Queries) GetTypeByEntryHistoryId(ctx context.Context, id interface{}) (GetTypeByEntryHistoryIdRow, error) {
+	row := q.db.QueryRow(ctx, getTypeByEntryHistoryId, id)
+	var i GetTypeByEntryHistoryIdRow
+	err := row.Scan(&i.ID, &i.Date, &i.Type)
+	return i, err
+}

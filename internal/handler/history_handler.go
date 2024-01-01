@@ -18,6 +18,7 @@ type HistoryHandler interface {
 	AllHistory(ctx *fiber.Ctx) error
 	CreateEntryHistory(ctx *fiber.Ctx) error
 	CalculatePriceHistory(ctx *fiber.Ctx) error
+	CreateExitHistory(ctx *fiber.Ctx) error
 }
 
 type historyHandler struct {
@@ -149,5 +150,38 @@ func (h *historyHandler) CalculatePriceHistory(ctx *fiber.Ctx) error {
 		Code:    http.StatusOK,
 		Message: "Success!",
 		Data:    res,
+	})
+}
+
+// CreateExitHistory godoc
+//
+//	@Summary		Post Create Exit History based on parameter
+//	@Description	Create Exit History
+//	@ID				post-create-exit-history
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			data	body		request.CreateExitHistoryRequest	true	"Data"
+//	@Success		200		{object}	response.BaseResponse
+//	@Failure		500		{object}	response.BaseResponse
+//	@Router			/history/exit [post]
+func (h *historyHandler) CreateExitHistory(ctx *fiber.Ctx) error {
+	req := new(request.CreateExitHistoryRequest)
+	err := ctx.BodyParser(req)
+	h.exception.IsBadRequestErr(err, "Invalid request body", false)
+
+	user := middleware.AuthUserData{}
+	err = user.Get(ctx)
+	h.exception.PanicIfError(err, false)
+	req.UserId = user.ID
+
+	err = req.Validate()
+	h.exception.IsErrValidation(err, false)
+
+	h.service.CreateExitHistory(ctx.Context(), *req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
 	})
 }

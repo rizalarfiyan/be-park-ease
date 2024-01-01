@@ -362,6 +362,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/history/exit": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "Create Exit History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Post Create Exit History based on parameter",
+                "operationId": "post-create-exit-history",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateExitHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/location": {
             "get": {
                 "security": [
@@ -1405,6 +1451,20 @@ const docTemplate = `{
                 },
                 "vehicle_type_code": {
                     "type": "string"
+                }
+            }
+        },
+        "request.CreateExitHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "entry_history_id": {
+                    "type": "string"
+                },
+                "location_code": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
                 }
             }
         },

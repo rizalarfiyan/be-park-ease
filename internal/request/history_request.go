@@ -47,3 +47,18 @@ func (req CalculatePriceHistoryRequest) Validate() error {
 		validation.Field(&req.VehicleNumber, validation.Required, validation.Length(3, 16), constants.ValidationVehicleNumber),
 	)
 }
+
+type CreateExitHistoryRequest struct {
+	EntryHistoryId string  `json:"entry_history_id"`
+	LocationCode   string  `json:"location_code"`
+	Price          float64 `json:"price"`
+	UserId         int32   `json:"-"`
+}
+
+func (req CreateExitHistoryRequest) Validate() error {
+	return validation.ValidateStruct(&req,
+		validation.Field(&req.EntryHistoryId, validation.Required, validation.Length(14, 16).Error("Entry History not found")),
+		validation.Field(&req.LocationCode, validation.Required, validation.Length(2, 16).Error("Location Type not found")),
+		validation.Field(&req.Price, validation.Required, validation.Min(0.0), validation.Max(99999999999999999999.99)),
+	)
+}
