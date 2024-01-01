@@ -64,7 +64,7 @@ func (r *router) SettingRoute(handler handler.SettingHandler) {
 
 func (r *router) VehicleTypeRoute(handler handler.VehicleTypeHandler) {
 	vehicleType := r.app.Group("vehicle_type")
-	vehicleType.Get("", r.mid.Auth(true), r.mid.Role(sql.UserRoleAdmin, true), handler.AllVehicleType)
+	vehicleType.Get("", r.mid.Auth(true), handler.AllVehicleType)
 	vehicleType.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateVehicleType)
 	vehicleType.Get(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.VehicleTypeByCode)
 	vehicleType.Put(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateVehicleType)
@@ -73,7 +73,7 @@ func (r *router) VehicleTypeRoute(handler handler.VehicleTypeHandler) {
 
 func (r *router) LocationRoute(handler handler.LocationHandler) {
 	location := r.app.Group("location")
-	location.Get("", r.mid.Auth(true), r.mid.Role(sql.UserRoleAdmin, true), handler.AllLocation)
+	location.Get("", r.mid.Auth(true), handler.AllLocation)
 	location.Post("", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.CreateLocation)
 	location.Get(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.LocationByCode)
 	location.Put(":code", r.mid.Auth(false), r.mid.Role(sql.UserRoleAdmin, false), handler.UpdateLocation)

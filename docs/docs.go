@@ -423,6 +423,12 @@ const docTemplate = `{
                         "description": "Order",
                         "name": "order",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Is Exit",
+                        "name": "is_exit",
+                        "in": "query"
                     }
                 ],
                 "responses": {

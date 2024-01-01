@@ -8,6 +8,7 @@ import (
 	"be-park-ease/internal/response"
 	"be-park-ease/internal/service"
 	"be-park-ease/middleware"
+	"be-park-ease/utils"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -49,16 +50,24 @@ func NewLocationHandler(service service.LocationService) LocationHandler {
 //	@Param			search		query		string	false	"Search"
 //	@Param			order_by	query		string	false	"Order by"	Enums(code,name,is_exit,date)
 //	@Param			order		query		string	false	"Order"		Enums(asc, desc)
+//	@Param			is_exit		query		bool	false	"Is Exit"
 //	@Success		200			{object}	response.BaseResponse{data=response.BaseResponsePagination[response.Location]}
 //	@Failure		500			{object}	response.BaseResponse
 //	@Router			/location [get]
 func (h *locationHandler) AllLocation(ctx *fiber.Ctx) error {
-	req := request.BasePagination{
-		Page:    ctx.QueryInt("page", 1),
-		Limit:   ctx.QueryInt("limit", constants.DefaultPageLimit),
-		Search:  ctx.Query("search"),
-		OrderBy: ctx.Query("order_by"),
-		Order:   ctx.Query("order"),
+	req := request.GetAllLocationRequest{
+		BasePagination: request.BasePagination{
+			Page:    ctx.QueryInt("page", 1),
+			Limit:   ctx.QueryInt("limit", constants.DefaultPageLimit),
+			Search:  ctx.Query("search"),
+			OrderBy: ctx.Query("order_by"),
+			Order:   ctx.Query("order"),
+		},
+	}
+
+	isExit, err := utils.StrToBool(ctx.Query("is_exit"))
+	if err == nil {
+		req.IsExit = &isExit
 	}
 
 	fieldOrder := map[string]string{

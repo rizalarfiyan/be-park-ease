@@ -532,6 +532,10 @@ paths:
         in: query
         name: order
         type: string
+      - description: Is Exit
+        in: query
+        name: is_exit
+        type: boolean
       produces:
       - application/json
       responses:

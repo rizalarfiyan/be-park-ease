@@ -17,7 +17,7 @@ import (
 )
 
 type LocationService interface {
-	AllLocation(ctx context.Context, req request.BasePagination) response.BaseResponsePagination[response.Location]
+	AllLocation(ctx context.Context, req request.GetAllLocationRequest) response.BaseResponsePagination[response.Location]
 	LocationByCode(ctx context.Context, code string) response.Location
 	CreateLocation(ctx context.Context, req request.CreateLocationRequest)
 	UpdateLocation(ctx context.Context, req request.UpdateLocationRequest)
@@ -38,7 +38,7 @@ func NewLocationService(repo repository.LocationRepository) LocationService {
 	}
 }
 
-func (s *locationService) AllLocation(ctx context.Context, req request.BasePagination) response.BaseResponsePagination[response.Location] {
+func (s *locationService) AllLocation(ctx context.Context, req request.GetAllLocationRequest) response.BaseResponsePagination[response.Location] {
 	data, err := s.repo.AllLocation(ctx, req)
 	s.exception.PanicIfError(err, true)
 	s.exception.IsNotFound(data, true)
@@ -57,7 +57,7 @@ func (s *locationService) AllLocation(ctx context.Context, req request.BasePagin
 		content.Content = append(content.Content, res)
 	}
 
-	return response.WithPagination[response.Location](content, req)
+	return response.WithPagination[response.Location](content, req.BasePagination)
 }
 
 func (s *locationService) LocationByCode(ctx context.Context, code string) response.Location {

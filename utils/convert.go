@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"math/big"
 	"strconv"
 	"strings"
@@ -46,5 +47,16 @@ func PGInt32(number int32) pgtype.Int4 {
 	return pgtype.Int4{
 		Int32: number,
 		Valid: true,
+	}
+}
+
+func StrToBool(str string) (bool, error) {
+	switch strings.ToLower(str) {
+	case "true", "t", "yes", "y", "1":
+		return true, nil
+	case "false", "f", "no", "n", "0":
+		return false, nil
+	default:
+		return false, fmt.Errorf("invalid boolean value: %s", str)
 	}
 }
