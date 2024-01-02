@@ -109,6 +109,8 @@ definitions:
     properties:
       fine_ticket_calculation:
         type: integer
+      max_capacity:
+        type: integer
       next_hour_calculation:
         type: integer
     type: object
@@ -254,6 +256,38 @@ definitions:
       vehicle_type_code:
         type: string
     type: object
+  response.HistoryStatistic:
+    properties:
+      available_space:
+        type: integer
+      charts:
+        items:
+          $ref: '#/definitions/response.HistoryStatisticChart'
+        type: array
+      current_vehicle:
+        type: integer
+      exit_revenue:
+        type: number
+      exit_total:
+        type: integer
+      fine_revenue:
+        type: number
+      fine_total:
+        type: integer
+      revenue_total:
+        type: number
+      vehicle_total:
+        type: integer
+    type: object
+  response.HistoryStatisticChart:
+    properties:
+      name:
+        type: string
+      revenue:
+        type: number
+      vehicle:
+        type: integer
+    type: object
   response.Location:
     properties:
       code:
@@ -268,6 +302,10 @@ definitions:
       fine_ticket_calculation:
         type: integer
       fine_ticket_calculation_description:
+        type: string
+      max_capacity:
+        type: integer
+      max_capacity_description:
         type: string
       next_hour_calculation:
         type: integer
@@ -594,6 +632,44 @@ paths:
       security:
       - AccessToken: []
       summary: Post Create Fine History based on parameter
+      tags:
+      - history
+  /history/statistic:
+    get:
+      consumes:
+      - application/json
+      description: All History Statistic
+      operationId: get-all-history-statistic
+      parameters:
+      - description: Time Frequency
+        enum:
+        - today
+        - week
+        - month
+        - quarter
+        - year
+        in: query
+        name: time_frequency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.HistoryStatistic'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      security:
+      - AccessToken: []
+      summary: Get All History Statistic based on parameter
       tags:
       - history
   /location:

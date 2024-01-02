@@ -25,6 +25,7 @@ type HistoryService interface {
 	CalculatePriceHistory(ctx context.Context, req request.CalculatePriceHistoryRequest) float64
 	CreateExitHistory(ctx context.Context, req request.CreateExitHistoryRequest)
 	CreateFineHistory(ctx context.Context, req request.CreateFineHistoryRequest)
+	GetAllHistoryStatistic(ctx context.Context, req request.TimeFrequency) response.HistoryStatistic
 }
 
 type historyService struct {
@@ -223,4 +224,66 @@ func (s *historyService) CreateFineHistory(ctx context.Context, req request.Crea
 	err := s.repo.CreateFineHistory(ctx, payload)
 	s.handleErrorExitHistory(err, false)
 	s.exception.PanicIfError(err, false)
+}
+
+func (s *historyService) GetAllHistoryStatistic(ctx context.Context, req request.TimeFrequency) response.HistoryStatistic {
+	timeFrequency := req.BuildTimeFrequency()
+
+	idx := 0
+	var tempArr = make(map[string]int)
+	var res response.HistoryStatistic
+	for date := timeFrequency.StartDate; !date.After(timeFrequency.EndDate); date = timeFrequency.CallbackDate(date) {
+		name := timeFrequency.CallbackName(date)
+		if _, ok := tempArr[name]; !ok {
+			tempArr[name] = idx
+		}
+		res.Charts = append(res.Charts, response.HistoryStatisticChart{
+			Name:    name,
+			Revenue: 0,
+			Vehicle: 0,
+		})
+		idx++
+	}
+
+	resStatistic := sql.GetCountHistoryStatisticParams{
+		StartAt: utils.PGTimeStamp(timeFrequency.StartDate),
+		EndAt:   utils.PGTimeStamp(timeFrequency.EndDate),
+	}
+	calc, err := s.repo.GetCountHistoryStatistic(ctx, resStatistic)
+	s.exception.PanicIfError(err, true)
+	setting := s.serviceSetting.GetAllSetting(ctx)
+
+	res.RevenueTotal = calc.Revenue
+	res.VehicleTotal = int(calc.Total)
+	res.CurrentVehicle = int(calc.EntryTotal)
+	res.ExitRevenue = calc.ExitRevenue
+	res.ExitTotal = int(calc.ExitRevenue)
+	res.FineRevenue = calc.FineRevenue
+	res.FineTotal = int(calc.FineTotal)
+
+	if req.TimeFrequency == constants.FilterTimeFrequencyToday {
+		res.AvailableSpace = setting.MaxCapacity - int(calc.EntryTotal)
+	}
+
+	payload := model.AllHistoryStatistic{
+		StartDate:     timeFrequency.StartDate,
+		EndDate:       timeFrequency.EndDate,
+		TimeFrequency: req.TimeFrequency,
+	}
+	data, err := s.repo.AllHistoryStatistic(ctx, payload)
+	s.exception.PanicIfError(err, true)
+
+	for _, data := range data {
+		if !data.Date.Valid {
+			continue
+		}
+
+		name := timeFrequency.CallbackName(data.Date.Time)
+		if idx, ok := tempArr[name]; ok {
+			res.Charts[idx].Revenue += float64(data.Revenue)
+			res.Charts[idx].Vehicle += int(data.Vehicle)
+		}
+	}
+
+	return res
 }

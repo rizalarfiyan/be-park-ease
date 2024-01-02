@@ -146,6 +146,85 @@ func (q *Queries) GetAllHistory(ctx context.Context) ([]GetAllHistoryRow, error)
 	return items, nil
 }
 
+const getAllHistoryStatistic = `-- name: GetAllHistoryStatistic :many
+select MIN(coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)))::date as date, SUM(coalesce(fh.price, coalesce(exh.price, 0))) as revenue, COUNT(*) as vehicle
+from entry_history eh
+LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
+LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
+`
+
+type GetAllHistoryStatisticRow struct {
+	Date    pgtype.Date
+	Revenue int64
+	Vehicle int64
+}
+
+func (q *Queries) GetAllHistoryStatistic(ctx context.Context) ([]GetAllHistoryStatisticRow, error) {
+	rows, err := q.db.Query(ctx, getAllHistoryStatistic)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetAllHistoryStatisticRow{}
+	for rows.Next() {
+		var i GetAllHistoryStatisticRow
+		if err := rows.Scan(&i.Date, &i.Revenue, &i.Vehicle); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCountHistoryStatistic = `-- name: GetCountHistoryStatistic :one
+select 
+    count(*) as total,
+    CAST(COALESCE(SUM(coalesce(fh.price, coalesce(exh.price, 0))), 0) AS float) as revenue,
+    CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NULL AND fh.fined_at IS NULL THEN 1 ELSE 0 END), 0) AS float) AS entry_total,
+    CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NOT NULL THEN 1 ELSE 0 END), 0) AS int) AS exit_total,
+    CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NOT NULL THEN exh.price ELSE 0 END), 0) AS float) AS exit_revenue,
+    CAST(COALESCE(SUM(CASE WHEN fh.fined_at IS NOT NULL THEN 1 ELSE 0 END), 0) AS int) AS fine_total,
+    CAST(COALESCE(SUM(CASE WHEN fh.fined_at IS NOT NULL THEN exh.price ELSE 0 END), 0) AS float) AS fine_revenue
+from entry_history eh
+LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
+LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
+WHERE coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) BETWEEN $1::timestamp AND $2::timestamp
+LIMIT 1
+`
+
+type GetCountHistoryStatisticParams struct {
+	StartAt pgtype.Timestamp
+	EndAt   pgtype.Timestamp
+}
+
+type GetCountHistoryStatisticRow struct {
+	Total       int64
+	Revenue     float64
+	EntryTotal  float64
+	ExitTotal   int32
+	ExitRevenue float64
+	FineTotal   int32
+	FineRevenue float64
+}
+
+func (q *Queries) GetCountHistoryStatistic(ctx context.Context, arg GetCountHistoryStatisticParams) (GetCountHistoryStatisticRow, error) {
+	row := q.db.QueryRow(ctx, getCountHistoryStatistic, arg.StartAt, arg.EndAt)
+	var i GetCountHistoryStatisticRow
+	err := row.Scan(
+		&i.Total,
+		&i.Revenue,
+		&i.EntryTotal,
+		&i.ExitTotal,
+		&i.ExitRevenue,
+		&i.FineTotal,
+		&i.FineRevenue,
+	)
+	return i, err
+}
+
 const getDataByEntryHistoryId = `-- name: GetDataByEntryHistoryId :one
 select eh.id, vt.price, coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) date,
    CASE WHEN fh.fined_at IS NOT NULL THEN 'fine' WHEN exh.exited_at IS NOT NULL THEN 'exit' ELSE 'entry' END AS type
