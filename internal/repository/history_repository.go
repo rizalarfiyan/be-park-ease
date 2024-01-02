@@ -19,6 +19,8 @@ type HistoryRepository interface {
 	CreateEntryHistory(ctx context.Context, req sql.CreateEntryHistoryParams) error
 	CreateExitHistory(ctx context.Context, req sql.CreateExitHistoryParams) error
 	CreateFineHistory(ctx context.Context, req sql.CreateFineHistoryParams) error
+	GetCountHistoryStatistic(ctx context.Context, req sql.GetCountHistoryStatisticParams) (sql.GetCountHistoryStatisticRow, error)
+	AllHistoryStatistic(ctx context.Context, req model.AllHistoryStatistic) ([]sql.GetAllHistoryStatisticRow, error)
 }
 
 type historyRepository struct {
@@ -102,4 +104,31 @@ func (r historyRepository) CreateExitHistory(ctx context.Context, req sql.Create
 
 func (r historyRepository) CreateFineHistory(ctx context.Context, req sql.CreateFineHistoryParams) error {
 	return r.query.CreateFineHistory(ctx, req)
+}
+
+func (r historyRepository) GetCountHistoryStatistic(ctx context.Context, req sql.GetCountHistoryStatisticParams) (sql.GetCountHistoryStatisticRow, error) {
+	return r.query.GetCountHistoryStatistic(ctx, req)
+}
+
+func (r *historyRepository) AllHistoryStatistic(ctx context.Context, req model.AllHistoryStatistic) ([]sql.GetAllHistoryStatisticRow, error) {
+	histories, err := r.queryBuilder.GetAllHistoryStatistic(utils.QueryBuild(ctx, func(b *utils.QueryBuilder) {
+		b.Where("coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) BETWEEN $1 AND $2", req.StartDate, req.EndDate)
+
+		switch req.TimeFrequency {
+		case constants.FilterTimeFrequencyToday:
+			b.GroupBy("DATE_TRUNC('hour', coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)))")
+		case constants.FilterTimeFrequencyYear:
+			b.GroupBy("DATE_TRUNC('month', coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)))")
+		default:
+			b.GroupBy("DATE_TRUNC('day', coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)))")
+		}
+
+		b.Order("coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) DESC")
+	}))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return histories, nil
 }

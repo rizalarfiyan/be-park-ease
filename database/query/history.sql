@@ -42,3 +42,23 @@ VALUES ($1, $2, $3, $4);
 -- name: CreateFineHistory :exec
 INSERT INTO fine_history (entry_history_id, location_code, price, identity, vehicle_identity, name, address, description, fined_by)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+
+-- name: GetAllHistoryStatistic :many
+select MIN(coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)))::date as date, SUM(coalesce(fh.price, coalesce(exh.price, 0))) as revenue, COUNT(*) as vehicle
+from entry_history eh
+LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
+LEFT JOIN fine_history fh on eh.id = fh.entry_history_id;
+
+-- name: GetCountHistoryStatistic :one
+select 
+    count(*) as total,
+    SUM(coalesce(fh.price, coalesce(exh.price, 0))) as revenue,
+    SUM(CASE WHEN exh.exited_at IS NULL AND fh.fined_at IS NULL THEN 1 ELSE 0 END) AS entry_total,
+    SUM(CASE WHEN exh.exited_at IS NOT NULL THEN 1 ELSE 0 END) AS exit_total,
+    SUM(CASE WHEN exh.exited_at IS NOT NULL THEN exh.price ELSE 0 END) AS exit_revenue,
+    SUM(CASE WHEN fh.fined_at IS NOT NULL THEN 1 ELSE 0 END) AS fine_total,
+    SUM(CASE WHEN fh.fined_at IS NOT NULL THEN exh.price ELSE 0 END) AS fine_revenue
+from entry_history eh
+LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
+LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
+WHERE coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) BETWEEN sqlc.arg(start_at)::timestamp AND sqlc.arg(end_at)::timestamp;

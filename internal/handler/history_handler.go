@@ -218,3 +218,31 @@ func (h *historyHandler) CreateFineHistory(ctx *fiber.Ctx) error {
 		Message: "Success!",
 	})
 }
+
+// GetAllHistoryStatistic godoc
+//
+//	@Summary		Get All History Statistic based on parameter
+//	@Description	All History Statistic
+//	@ID				get-all-history-statistic
+//	@Tags			history
+//	@Accept			json
+//	@Produce		json
+//	@Security		AccessToken
+//	@Param			time_frequency	query		string	false	"Time Frequency"	Enums(today,week,month,quarter,year)
+//	@Success		200				{object}	response.BaseResponse{data=response.HistoryStatistic}
+//	@Failure		500				{object}	response.BaseResponse
+//	@Router			/history/statistic [get]
+func (h *historyHandler) GetAllHistoryStatistic(ctx *fiber.Ctx) error {
+	req := request.TimeFrequency{
+		TimeFrequency: constants.FilterTimeFrequency(ctx.Query("time_frequency")),
+	}
+
+	req.Normalize()
+
+	res := h.service.GetAllHistoryStatistic(ctx.Context(), req)
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success!",
+		Data:    res,
+	})
+}
