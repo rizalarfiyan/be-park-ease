@@ -454,6 +454,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/history/statistic": {
+            "get": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "description": "All History Statistic",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "history"
+                ],
+                "summary": "Get All History Statistic based on parameter",
+                "operationId": "get-all-history-statistic",
+                "parameters": [
+                    {
+                        "enum": [
+                            "today",
+                            "week",
+                            "month",
+                            "quarter",
+                            "year"
+                        ],
+                        "type": "string",
+                        "description": "Time Frequency",
+                        "name": "time_frequency",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.HistoryStatistic"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/location": {
             "get": {
                 "security": [
@@ -1579,6 +1641,9 @@ const docTemplate = `{
                 "fine_ticket_calculation": {
                     "type": "integer"
                 },
+                "max_capacity": {
+                    "type": "integer"
+                },
                 "next_hour_calculation": {
                     "type": "integer"
                 }
@@ -1803,6 +1868,55 @@ const docTemplate = `{
                 }
             }
         },
+        "response.HistoryStatistic": {
+            "type": "object",
+            "properties": {
+                "available_space": {
+                    "type": "integer"
+                },
+                "charts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.HistoryStatisticChart"
+                    }
+                },
+                "current_vehicle": {
+                    "type": "integer"
+                },
+                "exit_revenue": {
+                    "type": "number"
+                },
+                "exit_total": {
+                    "type": "integer"
+                },
+                "fine_revenue": {
+                    "type": "number"
+                },
+                "fine_total": {
+                    "type": "integer"
+                },
+                "revenue_total": {
+                    "type": "number"
+                },
+                "vehicle_total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.HistoryStatisticChart": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "revenue": {
+                    "type": "number"
+                },
+                "vehicle": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.Location": {
             "type": "object",
             "properties": {
@@ -1824,6 +1938,12 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "fine_ticket_calculation_description": {
+                    "type": "string"
+                },
+                "max_capacity": {
+                    "type": "integer"
+                },
+                "max_capacity_description": {
                     "type": "string"
                 },
                 "next_hour_calculation": {

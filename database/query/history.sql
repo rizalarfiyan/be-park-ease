@@ -52,13 +52,14 @@ LEFT JOIN fine_history fh on eh.id = fh.entry_history_id;
 -- name: GetCountHistoryStatistic :one
 select 
     count(*) as total,
-    SUM(coalesce(fh.price, coalesce(exh.price, 0))) as revenue,
-    SUM(CASE WHEN exh.exited_at IS NULL AND fh.fined_at IS NULL THEN 1 ELSE 0 END) AS entry_total,
-    SUM(CASE WHEN exh.exited_at IS NOT NULL THEN 1 ELSE 0 END) AS exit_total,
-    SUM(CASE WHEN exh.exited_at IS NOT NULL THEN exh.price ELSE 0 END) AS exit_revenue,
-    SUM(CASE WHEN fh.fined_at IS NOT NULL THEN 1 ELSE 0 END) AS fine_total,
-    SUM(CASE WHEN fh.fined_at IS NOT NULL THEN exh.price ELSE 0 END) AS fine_revenue
+    CAST(COALESCE(SUM(coalesce(fh.price, coalesce(exh.price, 0))), 0) AS float) as revenue,
+    CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NULL AND fh.fined_at IS NULL THEN 1 ELSE 0 END), 0) AS float) AS entry_total,
+    CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NOT NULL THEN 1 ELSE 0 END), 0) AS int) AS exit_total,
+    CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NOT NULL THEN exh.price ELSE 0 END), 0) AS float) AS exit_revenue,
+    CAST(COALESCE(SUM(CASE WHEN fh.fined_at IS NOT NULL THEN 1 ELSE 0 END), 0) AS int) AS fine_total,
+    CAST(COALESCE(SUM(CASE WHEN fh.fined_at IS NOT NULL THEN exh.price ELSE 0 END), 0) AS float) AS fine_revenue
 from entry_history eh
 LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
 LEFT JOIN fine_history fh on eh.id = fh.entry_history_id
-WHERE coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) BETWEEN sqlc.arg(start_at)::timestamp AND sqlc.arg(end_at)::timestamp;
+WHERE coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) BETWEEN sqlc.arg(start_at)::timestamp AND sqlc.arg(end_at)::timestamp
+LIMIT 1;

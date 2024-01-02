@@ -123,7 +123,7 @@ func (r *historyRepository) AllHistoryStatistic(ctx context.Context, req model.A
 			b.GroupBy("DATE_TRUNC('day', coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)))")
 		}
 
-		b.Order("coalesce(fh.fined_at, coalesce(exh.exited_at, eh.created_at)) DESC")
+		b.Order("date DESC")
 	}))
 
 	if err != nil {

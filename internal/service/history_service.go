@@ -253,14 +253,17 @@ func (s *historyService) GetAllHistoryStatistic(ctx context.Context, req request
 	s.exception.PanicIfError(err, true)
 	setting := s.serviceSetting.GetAllSetting(ctx)
 
-	res.RevenueTotal = float64(calc.Revenue)
+	res.RevenueTotal = calc.Revenue
 	res.VehicleTotal = int(calc.Total)
 	res.CurrentVehicle = int(calc.EntryTotal)
-	res.AvailableSpace = setting.MaxCapacity - int(calc.EntryTotal)
-	res.ExitRevenue = float64(calc.ExitRevenue)
+	res.ExitRevenue = calc.ExitRevenue
 	res.ExitTotal = int(calc.ExitRevenue)
-	res.FineRevenue = float64(calc.FineRevenue)
+	res.FineRevenue = calc.FineRevenue
 	res.FineTotal = int(calc.FineTotal)
+
+	if req.TimeFrequency == constants.FilterTimeFrequencyToday {
+		res.AvailableSpace = setting.MaxCapacity - int(calc.EntryTotal)
+	}
 
 	payload := model.AllHistoryStatistic{
 		StartDate:     timeFrequency.StartDate,

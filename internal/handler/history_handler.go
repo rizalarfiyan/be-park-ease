@@ -20,6 +20,7 @@ type HistoryHandler interface {
 	CalculatePriceHistory(ctx *fiber.Ctx) error
 	CreateExitHistory(ctx *fiber.Ctx) error
 	CreateFineHistory(ctx *fiber.Ctx) error
+	GetAllHistoryStatistic(ctx *fiber.Ctx) error
 }
 
 type historyHandler struct {

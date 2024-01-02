@@ -43,6 +43,7 @@ func (r *router) AuthRoute(handler handler.AuthHandler) {
 func (r *router) HistoryRoute(handler handler.HistoryHandler) {
 	history := r.app.Group("history")
 	history.Get("", r.mid.Auth(false), handler.AllHistory)
+	history.Get("statistic", r.mid.Auth(false), handler.GetAllHistoryStatistic)
 	history.Post("entry", r.mid.Auth(false), handler.CreateEntryHistory)
 	history.Post("calculate", r.mid.Auth(false), handler.CalculatePriceHistory)
 	history.Post("exit", r.mid.Auth(false), handler.CreateExitHistory)
