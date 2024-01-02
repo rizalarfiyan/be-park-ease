@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS entry_history (
-    id varchars PRIMARY KEY,
+    id varchar PRIMARY KEY,
     location_code varchar(16) NOT NULL,
     vehicle_type_code varchar(16) NOT NULL,
     vehicle_number varchar(16) NOT NULL,
