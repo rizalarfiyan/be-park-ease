@@ -50,6 +50,10 @@ func (s *settingService) CreateOrUpdateSetting(ctx context.Context, req request.
 			Key:   constants.SettingNextHourCalculation,
 			Value: fmt.Sprint(req.NextHourCalculation),
 		},
+		{
+			Key:   constants.SettingMaxCapacity,
+			Value: fmt.Sprint(req.MaxCapacity),
+		},
 	}
 	err := s.repo.CreateOrUpdateSetting(ctx, payload)
 	s.exception.PanicIfError(err, false)

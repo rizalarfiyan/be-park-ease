@@ -251,11 +251,12 @@ func (s *historyService) GetAllHistoryStatistic(ctx context.Context, req request
 	}
 	calc, err := s.repo.GetCountHistoryStatistic(ctx, resStatistic)
 	s.exception.PanicIfError(err, true)
+	setting := s.serviceSetting.GetAllSetting(ctx)
 
 	res.RevenueTotal = float64(calc.Revenue)
 	res.VehicleTotal = int(calc.Total)
 	res.CurrentVehicle = int(calc.EntryTotal)
-	res.AvailableSpace = 9999 - int(calc.EntryTotal)
+	res.AvailableSpace = setting.MaxCapacity - int(calc.EntryTotal)
 	res.ExitRevenue = float64(calc.ExitRevenue)
 	res.ExitTotal = int(calc.ExitRevenue)
 	res.FineRevenue = float64(calc.FineRevenue)

@@ -19,4 +19,5 @@ var (
 var (
 	SettingFineTicketCalculation = "fine_ticket_calculation"
 	SettingNextHourCalculation   = "next_hour_calculation"
+	SettingMaxCapacity           = "max_capacity"
 )
