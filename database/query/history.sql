@@ -57,7 +57,7 @@ select
     CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NOT NULL THEN 1 ELSE 0 END), 0) AS int) AS exit_total,
     CAST(COALESCE(SUM(CASE WHEN exh.exited_at IS NOT NULL THEN exh.price ELSE 0 END), 0) AS float) AS exit_revenue,
     CAST(COALESCE(SUM(CASE WHEN fh.fined_at IS NOT NULL THEN 1 ELSE 0 END), 0) AS int) AS fine_total,
-    CAST(COALESCE(SUM(CASE WHEN fh.fined_at IS NOT NULL THEN exh.price ELSE 0 END), 0) AS float) AS fine_revenue
+    CAST(COALESCE(SUM(CASE WHEN fh.fined_at IS NOT NULL THEN fh.price ELSE 0 END), 0) AS float) AS fine_revenue
 from entry_history eh
 LEFT JOIN exit_history exh on eh.id = exh.entry_history_id
 LEFT JOIN fine_history fh on eh.id = fh.entry_history_id

@@ -257,7 +257,7 @@ func (s *historyService) GetAllHistoryStatistic(ctx context.Context, req request
 	res.VehicleTotal = int(calc.Total)
 	res.CurrentVehicle = int(calc.EntryTotal)
 	res.ExitRevenue = calc.ExitRevenue
-	res.ExitTotal = int(calc.ExitRevenue)
+	res.ExitTotal = int(calc.ExitTotal)
 	res.FineRevenue = calc.FineRevenue
 	res.FineTotal = int(calc.FineTotal)
 
